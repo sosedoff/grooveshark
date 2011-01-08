@@ -1,0 +1,10 @@
+require 'digest'
+require 'json'
+require 'rest-client'
+
+require 'Grooveshark/errors'
+require 'Grooveshark/request'
+require 'Grooveshark/client'
+require 'Grooveshark/user'
+require 'Grooveshark/playlist'
+require 'Grooveshark/song'
