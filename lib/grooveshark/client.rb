@@ -18,7 +18,6 @@ module Grooveshark
     
     # Get communication token
     def get_comm_token
-      puts "Grooveshark::Client.get_comm_token"
       @comm_token = nil # so that it doesn't send a token
       @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
     end
