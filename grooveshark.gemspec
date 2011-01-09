@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "grooveshark"
-  s.version = "0.1.0"
+  s.version = "0.1.1"
   s.date = "2011-01-08"
   s.description = "Unofficial ruby library for consuming the Grooveshark API."
   s.summary = "Grooveshark API"
