@@ -107,6 +107,25 @@ Add song to favorites
 Remove song from favorites
 
   user.remove_favorite(song) # Song object or song ID
+  
+= Explore community
+
+Get all recently active users
+
+  client.recent_users
+  
+Find user by ID
+
+  client.get_user_by_id('ID')
+  
+Find user by username
+
+  client.get_user_by_username('username')
+  
+Fetch recent user activity
+
+  user = client.get_user_by_username('user')
+  user.feed
 
 = TODO
 
