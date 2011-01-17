@@ -1,17 +1,33 @@
 module Grooveshark
   class User
-    attr_reader :id, :username, :premium, :data
+    attr_reader :id, :username, :email, :premium, :data
+    attr_reader :city, :country, :sex
     attr_reader :playlists, :favorites
 
     # Init user account object
     def initialize(client, data=nil)
       if data
-        @data = data
-        @id = data['userID']
+        @data     = data
+        @id       = data['user_id']
         @username = data['username']
-        @premium = data['isPremium']
+        @premium  = data['is_premium']
+        @email    = data['email']
+        @city     = data['city']
+        @country  = data['country']
+        @sex      = data['sex']
       end
-      @client = client
+      @client     = client
+    end
+    
+    # Get user avatar URL
+    def avatar
+      "http://beta.grooveshark.com/static/userimages/#{@id}.jpg"
+    end
+    
+    # Get user activity for the date
+    def feed(date=nil)
+      date = Time.now if date.nil?
+      @client.request('getProcessedUserFeedData', {:userID => @id, :day => date.strftime("%Y%m%d")})
     end
     
     # --------------------------------------------------------------------------
@@ -20,7 +36,7 @@ module Grooveshark
     
     # Fetch songs from library 
     def library(page=0)
-      resp = @client.request('userGetSongsInLibrary', {:userID => @id, :page => page.to_s})['Songs']
+      resp = @client.request('userGetSongsInLibrary', {:userID => @id, :page => page.to_s})['songs']
       resp.map { |s| Song.new(s) }
     end
     
@@ -43,7 +59,7 @@ module Grooveshark
     def playlists
       return @playlists if @playlists
       results = @client.request('userGetPlaylists', :userID => @id)
-      @playlists = results['Playlists'].map { |list| Playlist.new(@client, list, @id) }
+      @playlists = results['playlists'].map { |list| Playlist.new(@client, list, @id) }
     end
     
     # Get playlist by ID

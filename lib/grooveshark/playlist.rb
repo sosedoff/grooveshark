@@ -9,18 +9,18 @@ module Grooveshark
       @songs = []
     
       if data
-        @id       = data['PlaylistID']
-        @name     = data['Name']
-        @about    = data['About']
-        @picture  = data['Picture']
-        @user_id  = data['UserID'] || user_id
-        @username = data['Username']
+        @id       = data['playlist_id']
+        @name     = data['name']
+        @about    = data['about']
+        @picture  = data['picture']
+        @user_id  = data['user_id'] || user_id
+        @username = data['user_name']
       end
     end
 
     # Fetch playlist songs
     def load_songs
-      @songs = @client.request('playlistGetSongs', :playlistID => @id)['Songs']
+      @songs = @client.request('playlistGetSongs', :playlistID => @id)['songs']
       @songs.map! { |s| Song.new(s) }
     end
     

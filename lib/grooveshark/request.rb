@@ -12,7 +12,7 @@ module Grooveshark
     }
     
     # Perform API request
-    def request(method, params, secure=false)
+    def request(method, params={}, secure=false)
       agent = METHOD_CLIENTS.key?(method) ? METHOD_CLIENTS[method] : CLIENT
       url = "#{secure ? 'https' : 'http'}://#{API_BASE}/more.php?#{method}"
       body = {
@@ -40,6 +40,7 @@ module Grooveshark
       end
       
       data = JSON.parse(data)
+      data = data.normalize if data.kind_of?(Hash)
       return data['result'] unless data['fault']
     end
   end

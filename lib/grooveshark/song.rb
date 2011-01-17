@@ -8,23 +8,25 @@ module Grooveshark
     def initialize(data=nil)
       unless data.nil?
         @data       = data
-        @id         = data['SongID']
-        @name       = data['SongName'] || data['Name']
-        @artist     = data['ArtistName']
-        @artist_id  = data['ArtistID']
-        @album      = data['AlbumName']
-        @album_id   = data['AlbumID']
-        @track      = data['TrackNum']
-        @duration   = data['EstimateDuration']
-        @artwork    = data['CoverArtFilename']
-        @playcount  = data['SongPlays']
+        @id         = data['song_id']
+        @name       = data['song_name'] || data['name']
+        @artist     = data['artist_name']
+        @artist_id  = data['artist_id']
+        @album      = data['album_name']
+        @album_id   = data['album_id']
+        @track      = data['track_num']
+        @duration   = data['estimate_duration']
+        @artwork    = data['cover_art_filename']
+        @playcount  = data['song_plays']
       end
     end
     
+    # Presentable format
     def to_s
       [@id, @name, @artist].join(' - ')
     end
     
+    # Hash export for API usage
     def to_hash
       {
         'songID'      => @id,

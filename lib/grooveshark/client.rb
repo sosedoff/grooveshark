@@ -37,7 +37,18 @@ module Grooveshark
       raise InvalidAuthentication, 'Wrong username or password!' if @user.id == 0
       return @user
     end
-  
+    
+    # Find user by ID
+    def get_user_by_id(id)
+      resp = request('getUserByID', {:userID => id})['user']
+      resp['username'].empty? ? nil : User.new(self, resp)
+    end
+    
+    # Get recently active users
+    def recent_users
+      request('getRecentlyActiveUsers', {})['users'].map { |u| User.new(self, u) }
+    end
+      
     # Perform search request for query
     def search(type, query)
       results = request('getSearchResults', {:type => type, :query => query})
@@ -72,7 +83,7 @@ module Grooveshark
     # Get song stream url by ID
     def get_song_url_by_id(id)
       resp = get_stream_auth_by_songid(id)
-      "http://#{resp['ip']}/stream.php?streamKey=#{resp['streamKey']}"
+      "http://#{resp['ip']}/stream.php?streamKey=#{resp['stream_key']}"
     end
     
     # Get song stream
