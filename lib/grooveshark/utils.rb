@@ -16,7 +16,7 @@ class Hash
         when Hash
           h[attr] = v.normalize
         when Array
-          h[attr] = v.map { |o| o.normalize }
+          h[attr] = v.map { |o| o.kind_of?(Hash) ? o.normalize : o }
         else
           h[attr] = v
       end

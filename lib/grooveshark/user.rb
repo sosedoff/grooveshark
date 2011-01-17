@@ -24,7 +24,7 @@ module Grooveshark
       "http://beta.grooveshark.com/static/userimages/#{@id}.jpg"
     end
     
-    # Get user activity for the date
+    # Get user activity for the date (COMES AS RAW RESPONSE)
     def feed(date=nil)
       date = Time.now if date.nil?
       @client.request('getProcessedUserFeedData', {:userID => @id, :day => date.strftime("%Y%m%d")})

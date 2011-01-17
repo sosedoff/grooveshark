@@ -44,6 +44,12 @@ module Grooveshark
       resp['username'].empty? ? nil : User.new(self, resp)
     end
     
+    # Find user by username
+    def get_user_by_username(name)
+      resp = request('getUserByUsername', {:username => name})['user']
+      resp['username'].empty? ? nil : User.new(self, resp)
+    end
+    
     # Get recently active users
     def recent_users
       request('getRecentlyActiveUsers', {})['users'].map { |u| User.new(self, u) }
