@@ -108,6 +108,22 @@ Remove song from favorites
 
   user.remove_favorite(song) # Song object or song ID
   
+= User library
+
+Get all songs from library as a collection of Song objects
+
+  songs = user.library
+  
+Add songs to library
+
+  songs = client.search_songs('The Beatles')
+  user.library_add(songs)
+  
+Remove selected songs from library. Unfortunately mass-deletion is not supported by Grooveshark API. You will have to delete each song via separate method call.
+
+  song = user.library.first # Lest pick a first song in the library
+  user.library_remove(song)
+  
 = Explore community
 
 Get all recently active users

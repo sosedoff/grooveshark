@@ -40,15 +40,16 @@ module Grooveshark
       resp.map { |s| Song.new(s) }
     end
     
-    # Add songs to user library (DOES NOT WORK FOR SOME REASON)
+    # Add songs to user's library
     def library_add(songs=[])
       @client.request('userAddSongsToLibrary', {:songs => songs.map { |s| s.to_hash }})
     end
     
     # Remove song from user library
     def library_remove(song)
-      song_id = song.kind_of?(Song) ? song.id : song.to_s
-      @client.request('userRemoveSongFromLibrary', {:userID => @id, :songID => song_id})
+      raise ArgumentError, 'Song object required' unless song.kind_of?(Song)
+      req = {:userID => @id, :songID => song.id, :albumID => song.album_id, :artistID => song.artist_id}
+      @client.request('userRemoveSongFromLibrary', req)
     end
     
     # --------------------------------------------------------------------------
