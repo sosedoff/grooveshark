@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = "grooveshark"
-  s.version = "0.1.1"
-  s.date = "2011-01-08"
+  s.version = "0.2.0"
+  s.date = "2011-01-18"
   s.description = "Unofficial ruby library for consuming the Grooveshark API."
   s.summary = "Grooveshark API"
   s.authors = ["Dan Sosedoff"]
@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
 
   s.files = %w[
     lib/grooveshark.rb
+    lib/grooveshark/utils.rb
     lib/grooveshark/client.rb
     lib/grooveshark/errors.rb
     lib/grooveshark/playlist.rb
