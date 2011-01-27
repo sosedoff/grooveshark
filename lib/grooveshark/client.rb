@@ -63,7 +63,7 @@ module Grooveshark
     
     # Perform songs search request for query
     def search_songs(query)
-      search('Songs', query)
+      search('Songs', query)['songs']
     end
     
     # Return raw response for songs search request

@@ -1,15 +1,18 @@
+require 'lib/grooveshark/version'
+
 Gem::Specification.new do |s|
-  s.name = "grooveshark"
-  s.version = "0.2.0"
-  s.date = "2011-01-18"
+  s.name        = "grooveshark"
+  s.version     = Grooveshark::VERSION
+  s.date        = Time.now.strftime('%Y-%m-%d')
   s.description = "Unofficial ruby library for consuming the Grooveshark API."
-  s.summary = "Grooveshark API"
-  s.authors = ["Dan Sosedoff"]
-  s.email = "dan.sosedoff@gmail.com"
-  s.homepage = "http://github.com/sosedoff/grooveshark"
+  s.summary     = "Grooveshark API"
+  s.authors     = ["Dan Sosedoff"]
+  s.email       = "dan.sosedoff@gmail.com"
+  s.homepage    = "http://github.com/sosedoff/grooveshark"
 
   s.files = %w[
     lib/grooveshark.rb
+    lib/grooveshark/version.rb
     lib/grooveshark/utils.rb
     lib/grooveshark/client.rb
     lib/grooveshark/errors.rb
