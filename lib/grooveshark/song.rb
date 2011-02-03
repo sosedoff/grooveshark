@@ -2,7 +2,7 @@ module Grooveshark
   class Song
     attr_reader :data
     attr_reader :id, :artist_id, :album_id
-    attr_reader :name, :artist, :album, :track
+    attr_reader :name, :artist, :album, :track, :year
     attr_reader :duraion, :artwork, :playcount
   
     def initialize(data=nil)
@@ -18,6 +18,7 @@ module Grooveshark
         @duration   = data['estimate_duration']
         @artwork    = data['cover_art_filename']
         @playcount  = data['song_plays']
+        @year       = data['year']
       end
     end
     
