@@ -52,6 +52,11 @@ module Grooveshark
       @client.request('userRemoveSongFromLibrary', req)
     end
     
+    # Get library modification time
+    def library_ts_modified
+      @client.request('userGetLibraryTSModified', {:userID => @id})
+    end
+    
     # --------------------------------------------------------------------------
     # User Playlists
     # --------------------------------------------------------------------------
@@ -68,6 +73,8 @@ module Grooveshark
       result = playlists.select { |p| p.id == id }
       result.nil? ? nil : result.first
     end
+    
+    alias :playlist :get_playlist
     
     # Create new user playlist
     def create_playlist(name, description='', songs=[])

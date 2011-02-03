@@ -1,10 +1,11 @@
 module Grooveshark
   module Request
-    API_BASE = 'cowbell.grooveshark.com'
-    UUID = 'E2AB1A59-C6B7-480E-992A-55DE1699D7F8'
-    CLIENT = 'htmlshark'
-    CLIENT_REV = '20101012.37'
-    COUNTRY = {"CC2" => "0","IPR" => "1","CC1" => "0","ID" => "1","CC4" => "0","CC3" => "0"}
+    API_BASE        = 'cowbell.grooveshark.com'
+    UUID            = '8A9058C8-305A-43D7-AAF2-85830AE2F2C0'
+    CLIENT          = 'htmlshark'
+    CLIENT_REV      = '20101222.07'
+    COUNTRY         = {"CC2" => "0", "IPR" => "353", "CC4" => "1073741824", "CC3" => "0", "CC1" => "0", "ID" => "223"}
+    TOKEN_TTL       = 300 # 5 minutes
     
     # Client overrides for different methods
     METHOD_CLIENTS = {
@@ -13,6 +14,8 @@ module Grooveshark
     
     # Perform API request
     def request(method, params={}, secure=false)
+      refresh_token if @comm_token
+      
       agent = METHOD_CLIENTS.key?(method) ? METHOD_CLIENTS[method] : CLIENT
       url = "#{secure ? 'https' : 'http'}://#{API_BASE}/more.php?#{method}"
       body = {
@@ -41,7 +44,17 @@ module Grooveshark
       
       data = JSON.parse(data)
       data = data.normalize if data.kind_of?(Hash)
-      return data['result'] unless data['fault']
+      
+      if data.key?('fault')
+        raise ApiError.new(data['fault'])
+      else
+        data['result']
+      end
+    end
+    
+    # Refresh communications token on ttl
+    def refresh_token
+      get_comm_token if Time.now.to_i - @comm_token_ttl > TOKEN_TTL
     end
   end
 end

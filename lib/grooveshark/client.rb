@@ -4,11 +4,14 @@ module Grooveshark
     
     attr_accessor :session, :comm_token
     attr_reader :user
+    attr_reader :comm_token_ttl
   
     def initialize(session=nil)
       @session = session || get_session
       get_comm_token
     end
+    
+    protected
     
     # Obtain new session from Grooveshark
     def get_session
@@ -18,8 +21,9 @@ module Grooveshark
     
     # Get communication token
     def get_comm_token
-      @comm_token = nil # so that it doesn't send a token
+      @comm_token = nil
       @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
+      @comm_token_ttl = Time.now.to_i
     end
     
     # Sign method
@@ -29,6 +33,8 @@ module Grooveshark
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
     end
+    
+    public
     
     # Authenticate user
     def login(user, password)
