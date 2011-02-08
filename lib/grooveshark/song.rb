@@ -3,7 +3,7 @@ module Grooveshark
     attr_reader :data
     attr_reader :id, :artist_id, :album_id
     attr_reader :name, :artist, :album, :track, :year
-    attr_reader :duraion, :artwork, :playcount
+    attr_reader :duration, :artwork, :playcount
   
     def initialize(data=nil)
       unless data.nil?
