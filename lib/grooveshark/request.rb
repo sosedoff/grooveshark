@@ -1,11 +1,11 @@
 module Grooveshark
   module Request
     API_BASE        = 'cowbell.grooveshark.com'
-    UUID            = '8A9058C8-305A-43D7-AAF2-85830AE2F2C0'
+    UUID            = 'A3B724BA-14F5-4932-98B8-8D375F85F266'
     CLIENT          = 'htmlshark'
-    CLIENT_REV      = '20101222.07'
+    CLIENT_REV      = '20101222.41'
     COUNTRY         = {"CC2" => "0", "IPR" => "353", "CC4" => "1073741824", "CC3" => "0", "CC1" => "0", "ID" => "223"}
-    TOKEN_TTL       = 300 # 5 minutes
+    TOKEN_TTL       = 120 # 2 minutes
     
     # Client overrides for different methods
     METHOD_CLIENTS = {
