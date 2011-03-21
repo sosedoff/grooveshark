@@ -60,6 +60,13 @@ module Grooveshark
     def recent_users
       request('getRecentlyActiveUsers', {})['users'].map { |u| User.new(self, u) }
     end
+    
+    # Get popular songs
+    # type => daily, monthly
+    def popular_songs(type='daily')
+      raise ArgumentError, 'Invalid type' unless ['daily', 'monthly'].include?(type)
+      request('popularGetSongs', {:type => type})['songs'].map { |s| Song.new(s) }
+    end
       
     # Perform search request for query
     def search(type, query)
