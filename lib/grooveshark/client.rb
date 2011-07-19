@@ -6,6 +6,11 @@ module Grooveshark
     attr_reader :user
     attr_reader :comm_token_ttl
   
+    SALT = 'backToTheScienceLab'
+    METHOD_SALTS = { 
+      'getStreamKeyFromSongIDEx' => 'bewareOfBearsharktopus'
+    }
+  
     def initialize(session=nil)
       @session = session || get_session
       get_comm_token
@@ -29,7 +34,8 @@ module Grooveshark
     # Sign method
     def create_token(method)
       rnd = rand(256**3).to_s(16).rjust(6, '0')
-      plain = [method, @comm_token, 'quitStealinMahShit', rnd].join(':')
+      salt = METHOD_SALTS.key?(method) ? METHOD_SALTS[method] : SALT
+      plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
     end
