@@ -1,4 +1,5 @@
-require 'lib/grooveshark/version'
+# -*- encoding: utf-8 -*-
+require File.expand_path('../lib/grooveshark/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "grooveshark"
@@ -9,10 +10,10 @@ Gem::Specification.new do |s|
   s.email       = "dan.sosedoff@gmail.com"
   s.homepage    = "http://github.com/sosedoff/grooveshark"
 
-  gem.files         = `git ls-files`.split("\n")
-  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  gem.executables   = `git ls-files -- bin/*`.split("\n").map{|f| File.basename(f)}
-  gem.require_paths = ['lib']
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables   = `git ls-files -- bin/*`.split("\n").map{|f| File.basename(f)}
+  s.require_paths = ['lib']
   
   s.add_development_dependency 'rspec',       '~> 2.6'
   
