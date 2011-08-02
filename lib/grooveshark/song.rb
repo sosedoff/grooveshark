@@ -24,7 +24,7 @@ module Grooveshark
     
     # Presentable format
     def to_s
-      [@id, @name, @artist].join(' - ')
+      "#{@name} - #{@artist}"
     end
     
     # Hash export for API usage

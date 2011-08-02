@@ -4,7 +4,7 @@ describe 'Client' do
   context 'initialization' do
     it 'should have a valid session' do
       @gs = Grooveshark::Client.new
-      @gs.session.should_not == nil
+      @gs.session.nil?.should == false
       @gs.session.should match /^[abcdef\d]{32}$/i
     end
   end
@@ -17,7 +17,7 @@ describe 'Client' do
   end
   
   context 'search' do
-    before(:all) do
+    before do
       @gs = Grooveshark::Client.new
     end
     

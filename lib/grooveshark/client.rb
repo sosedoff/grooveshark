@@ -1,47 +1,22 @@
 module Grooveshark
   class Client
+    include Grooveshark::Connection
     include Grooveshark::Request
     
-    attr_accessor :session, :comm_token
-    attr_reader :user
-    attr_reader :comm_token_ttl
+    attr_accessor :session
+    attr_reader   :communication_token
+    attr_reader   :communication_token_ttl
+    attr_reader   :user
   
-    SALT = 'backToTheScienceLab'
-    METHOD_SALTS = { 
-      'getStreamKeyFromSongIDEx' => 'bewareOfBearsharktopus'
-    }
-  
+    # Initialize a new Grooveshark::Client instance
+    #
+    # session - Valid session ID (optional)
+    # 
     def initialize(session=nil)
-      @session = session || get_session
-      get_comm_token
+      @session = session || request_session_token
+      request_communication_token
     end
-    
-    protected
-    
-    # Obtain new session from Grooveshark
-    def get_session
-      resp = RestClient.get('http://listen.grooveshark.com')
-      resp.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
-    end
-    
-    # Get communication token
-    def get_comm_token
-      @comm_token = nil
-      @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
-      @comm_token_ttl = Time.now.to_i
-    end
-    
-    # Sign method
-    def create_token(method)
-      rnd = rand(256**3).to_s(16).rjust(6, '0')
-      salt = METHOD_SALTS.key?(method) ? METHOD_SALTS[method] : SALT
-      plain = [method, @comm_token, salt, rnd].join(':')
-      hash = Digest::SHA1.hexdigest(plain)
-      "#{rnd}#{hash}"
-    end
-    
-    public
-    
+      
     # Authenticate user
     def login(user, password)
       data = request('authenticateUser', {:username => user, :password => password}, true)

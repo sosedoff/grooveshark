@@ -1,9 +1,6 @@
-require 'digest'
-require 'json'
-require 'rest-client'
-
 require 'grooveshark/utils'
 require 'grooveshark/errors'
+require 'grooveshark/connection'
 require 'grooveshark/request'
 require 'grooveshark/client'
 require 'grooveshark/user'
