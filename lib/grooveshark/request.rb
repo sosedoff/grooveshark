@@ -16,27 +16,28 @@ module Grooveshark
     def request(method, params={}, secure=false)
       refresh_token if @comm_token
       
-      agent = METHOD_CLIENTS.key?(method) ? METHOD_CLIENTS[method] : CLIENT
+      agent = METHOD_CLIENTS[method] || CLIENT
       url = "#{secure ? 'https' : 'http'}://#{API_BASE}/more.php?#{method}"
       body = {
         'header' => {
-          'session' => @session,
-          'uuid' => UUID,
-          'client' => agent,
+          'session'        => @session,
+          'uuid'           => UUID,
+          'client'         => agent,
           'clientRevision' => CLIENT_REV,
-          'country' => COUNTRY
+          'country'        => COUNTRY
         },
-        'method' => method,
-        'parameters' => params
+        'method'           => method,
+        'parameters'       => params
       }
       body['header']['token'] = create_token(method) if @comm_token
       
       begin
         data = RestClient.post(
-          url, body.to_json,
+          url,
+          body.to_json,
           :content_type => :json,
-          :accept => :json,
-          :cookie => "PHPSESSID=#{@session}"
+          :accept       => :json,
+          :cookie       => "PHPSESSID=#{@session}"
         )
       rescue Exception => ex
         raise GeneralError    # Need define error handling
