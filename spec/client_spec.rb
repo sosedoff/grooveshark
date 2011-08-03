@@ -1,4 +1,4 @@
-require File.expand_path("./helper", File.dirname(__FILE__))
+require 'spec_helper'
 
 describe 'Client' do
   context 'initialization' do
