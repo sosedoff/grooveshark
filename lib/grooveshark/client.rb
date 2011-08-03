@@ -18,6 +18,12 @@ module Grooveshark
     end
       
     # Authenticate user
+    #
+    # user     - Grooveshark account username
+    # password - Grooveshark account password
+    #
+    # @return [Grooveshark::User]
+    #
     def login(user, password)
       data = request('authenticateUser', {:username => user, :password => password}, true)
       @user = User.new(self, data)
@@ -26,47 +32,73 @@ module Grooveshark
     end
     
     # Find user by ID
+    #
+    # id - Grooveshark user ID
+    #
+    # @return [Grooveshark::User]
+    #
     def get_user_by_id(id)
       resp = request('getUserByID', {:userID => id})['user']
       resp['username'].empty? ? nil : User.new(self, resp)
     end
     
-    # Find user by username
+    # Find user by account username
+    #
+    # name - Grooveshark user username
+    #
+    # @return [Grooveshark::User]
+    #
     def get_user_by_username(name)
       resp = request('getUserByUsername', {:username => name})['user']
       resp['username'].empty? ? nil : User.new(self, resp)
     end
     
     # Get recently active users
-    def recent_users
+    #
+    def recently_active_users
       request('getRecentlyActiveUsers', {})['users'].map { |u| User.new(self, u) }
     end
     
-    # Get popular songs
-    # type => daily, monthly
+    # Returns a collection of popular songs for the time period
+    #
+    # type - daily, monthly
+    #
     def popular_songs(type='daily')
-      raise ArgumentError, 'Invalid type' unless ['daily', 'monthly'].include?(type)
-      request('popularGetSongs', {:type => type})['songs'].map { |s| Song.new(s) }
+      unless ['daily', 'monthly'].include?(type)
+        raise ArgumentError, "Invalid type: #{type}."
+      end
+      request('popularGetSongs', {:type => type})['songs'].map { |s| Song.new(self, s) }
     end
       
-    # Perform search request for query
-    def search(type, query)
-      results = request('getSearchResults', {:type => type, :query => query})['songs']
-      results.map { |song| Song.new song }
-    end
-    
-    # Perform songs search request for query
+    # Returns a collection of songs found for query
+    #
+    # query - Search query (ex.: AC/DC - Back In Black)
+    #
     def search_songs(query)
-      search('Songs', query)
+      search(:songs, query).map { |record| Song.new(self, record) }
     end
     
-    # Return raw response for songs search request
-    def search_songs_pure(query)
-      request('getSearchResultsEx', {:type => 'Songs', :query => query})
+    alias :songs :search_songs
+    
+    # Returns a collection of artists
+    #
+    # query - Search query (ex.: AC/DC)
+    #
+    # @return [Array]
+    #
+    def search_artists(query)
+      search(:artists, query).map { |record| Artist.new(self, record) }
     end
     
-    # Get stream authentication by song ID
-    def get_stream_auth_by_songid(song_id)
+    alias :artists :search_artists
+    
+    # Returns a stream authentication for song
+    #
+    # song - Grooveshark::Song object or ID
+    #
+    def get_stream_auth(song)
+      song_id = song.kind_of?(Grooveshark::Song) ? song.id : song.to_s
+      
       request('getStreamKeyFromSongIDEx', {
         'songID'    => song_id,
         'prefetch'  => false,
@@ -74,21 +106,33 @@ module Grooveshark
         'country'   => COUNTRY
       })
     end
-  
-    # Get stream authentication for song object
-    def get_stream_auth(song)
-      get_stream_auth_by_songid(song.id)
-    end
     
-    # Get song stream url by ID
-    def get_song_url_by_id(id)
-      resp = get_stream_auth_by_songid(id)
-      "http://#{resp['ip']}/stream.php?streamKey=#{resp['stream_key']}"
-    end
-    
-    # Get song stream
+    # Returns a direct streaming url for song
+    #
+    # song - Grooveshark::Song object or ID
+    #
+    # @return [String]
+    # 
     def get_song_url(song)
-      get_song_url_by_id(song.id)
+      auth = get_stream_auth(song)
+      "http://#{auth['ip']}/stream.php?streamKey=#{auth['stream_key']}"
+    end
+    
+    protected
+    
+    # Returns a collection of search results
+    #
+    # type  - Search index (artists, songs)
+    # query - Search query
+    #
+    # @return [Array]
+    #
+    def search(type, query)
+      type = type.to_s.capitalize
+      unless ['Songs', 'Artists'].include?(type)
+        raise ArgumentError, "Invalid search type: #{type}."
+      end    
+      request('getSearchResults', {:type => type, :query => query})[type.downcase]
     end
   end
 end

@@ -31,7 +31,7 @@ module Grooveshark
     #
     def connection(https=false)
       base_url = https ? 'https://' : 'http://'
-      base_url << API_BASE + '/more.php'
+      base_url << API_BASE
       
       Faraday.new(base_url) do |c|
         # c.use(Faraday::Response::Logger)   # DEBUG OUTPUT

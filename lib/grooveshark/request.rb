@@ -37,8 +37,8 @@ module Grooveshark
       end
       
       # Execute the request
-      response = connection(secure).send(:post) do |request|
-        request.url("?" + method)
+      response = connection(secure).send(:post) do |request|  
+        request.url("/more.php", :method => method)
         request.body = MultiJson.encode(body)
         
         request.headers['Content-Type'] = 'application/json'

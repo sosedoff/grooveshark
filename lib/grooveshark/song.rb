@@ -1,13 +1,22 @@
 module Grooveshark
   class Song
-    attr_reader :data
     attr_reader :id, :artist_id, :album_id
     attr_reader :name, :artist, :album, :track, :year
     attr_reader :duration, :artwork, :playcount
   
-    def initialize(data=nil)
+    # Initialize a new Grooveshark::Song object
+    #
+    # client - Grooveshark::Client
+    # data   - Song data hash
+    #
+    def initialize(client, data=nil)
+      unless client.kind_of?(Grooveshark::Client)
+        raise ArgumentError, "Grooveshark::Client required!"
+      end
+      
+      @client = client
+      
       unless data.nil?
-        @data       = data
         @id         = data['song_id']
         @name       = data['song_name'] || data['name']
         @artist     = data['artist_name']
@@ -22,12 +31,14 @@ module Grooveshark
       end
     end
     
-    # Presentable format
+    # Returns a string representation of song
+    #
     def to_s
       "#{@name} - #{@artist}"
     end
     
-    # Hash export for API usage
+    # Returns a hash formatted for API usage
+    # 
     def to_hash
       {
         'songID'      => @id,
@@ -38,6 +49,12 @@ module Grooveshark
         'albumID'     => @album_id,
         'track'       => @track
       }
+    end
+    
+    # Returns a direct streaming URL
+    #
+    def stream_url
+      @stream_url ||= @client.get_song_url(self)
     end
   end
 end

@@ -17,3 +17,15 @@ end
 def json_fixture(file)
   MultiJson.decode(fixture(file))
 end
+
+def api_url(method)
+  "http://#{Grooveshark::API_BASE}/more.php?method=#{method}"
+end
+
+def api_secure_url(method)
+  "https://#{Grooveshark::API_BASE}/more.php?method=#{method}"
+end
+
+def stub_get(method)
+  
+end

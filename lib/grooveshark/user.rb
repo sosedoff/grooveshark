@@ -11,7 +11,11 @@ module Grooveshark
     attr_reader :city, :country, :sex
     attr_reader :playlists, :favorites
 
-    # Init user account object
+    # Initialize a new Grooveshark::User object
+    #
+    # client - Grooveshark::Client instance
+    # data   - Hash containing user information
+    #
     def initialize(client, data=nil)
       if data
         @data     = data
