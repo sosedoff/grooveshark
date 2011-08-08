@@ -46,5 +46,9 @@ describe 'Client' do
       album.album_id.should == @song.album_id
     end
     
+    it "should include the song originally requested" do
+      songs = @gs.get_album(@song).songs.map { |s| s.name }
+      songs.include?(@song.name).should be_true
+    end
   end
 end

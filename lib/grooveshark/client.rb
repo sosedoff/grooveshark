@@ -120,11 +120,16 @@ module Grooveshark
       return get_album_by_id(song.album_id)
     end
     
+    def get_songs_by_album_id(id)
+      songs = []
+      request('albumGetSongs', {:albumID => id, :isVerified => true, :offset => 0})['songs'].each { |s| songs << Song.new(s)}
+      return songs
+    end
+    
     # Get album from album_id
     def get_album_by_id(id)
       desc = request('getAlbumByID', { :albumID => id })
-      return Album.new(desc)
-      # songs = request('albumGetSongs', {:albumID => id, :isVerified => true, :offset => 0})
+      return Album.new(desc, get_songs_by_album_id(id))
     end
   end
 end
