@@ -5,7 +5,7 @@ module Grooveshark
     attr_reader :name, :artist, :album, :track, :year
     attr_reader :duration, :artwork, :playcount
   
-    def initialize(data=nil)
+    def initialize(data= {})
       unless data.nil?
         @data       = data
         @id         = data['song_id']
