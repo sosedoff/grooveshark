@@ -3,7 +3,6 @@ module Grooveshark
     attr_reader :id, :artist_id, :album_id
     attr_reader :name, :artist, :album, :track, :year
     attr_reader :duration, :artwork, :playcount
-  
     # Initialize a new Grooveshark::Song object
     #
     # client - Grooveshark::Client
@@ -15,7 +14,6 @@ module Grooveshark
       end
       
       @client = client
-      
       unless data.nil?
         @id         = data['song_id']
         @name       = data['song_name'] || data['name']
