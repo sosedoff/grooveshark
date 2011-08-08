@@ -115,5 +115,16 @@ module Grooveshark
     def get_song_url(song)
       get_song_url_by_id(song.id)
     end
+    
+    def get_album(song)
+      return get_album_by_id(song.album_id)
+    end
+    
+    # Get album from album_id
+    def get_album_by_id(id)
+      desc = request('getAlbumByID', { :albumID => id })
+      return Album.new(desc)
+      # songs = request('albumGetSongs', {:albumID => id, :isVerified => true, :offset => 0})
+    end
   end
 end

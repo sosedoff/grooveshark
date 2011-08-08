@@ -33,4 +33,18 @@ describe 'Client' do
       songs.size.should_not == 0
     end
   end
+  
+  context "get_album" do
+    before(:all) do
+      @gs = Grooveshark::Client.new
+      @song = @gs.search_songs('Nirvana')[0]
+    end
+    
+    it "should return album object with same album_id of a song" do
+      album = @gs.get_album(@song)
+      album.should be_a_kind_of Grooveshark::Album
+      album.album_id.should == @song.album_id
+    end
+    
+  end
 end

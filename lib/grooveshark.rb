@@ -9,3 +9,4 @@ require 'grooveshark/client'
 require 'grooveshark/user'
 require 'grooveshark/playlist'
 require 'grooveshark/song'
+require "grooveshark/album"
