@@ -34,7 +34,7 @@ describe 'Client' do
     end
   end
   
-  context "get_album" do
+  context "album from id" do
     before(:all) do
       @gs = Grooveshark::Client.new
       @song = @gs.search_songs('Nirvana')[0]
