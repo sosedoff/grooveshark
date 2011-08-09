@@ -141,6 +141,10 @@ module Grooveshark
       return songs
     end
     
+    def get_artist_by_id(id)
+      Artist.new(self, request('getArtistByID', { :artistID => id }))
+    end
+    
     protected
     
     # Returns a collection of search results

@@ -17,7 +17,6 @@ module Grooveshark
       unless data.nil?
         @id         = data['song_id']
         @name       = data['song_name'] || data['name']
-        @artist     = data['artist_name']
         @artist_id  = data['artist_id']
         @album_id   = data['album_id']
         @track      = data['track_num']
@@ -46,6 +45,10 @@ module Grooveshark
         'albumID'     => @album_id,
         'track'       => @track
       }
+    end
+    
+    def artist
+      @artist ||= @client.get_artist_by_id(@artist_id)
     end
     
     def album
