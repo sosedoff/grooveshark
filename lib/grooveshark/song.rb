@@ -3,7 +3,6 @@ module Grooveshark
     attr_reader :id, :artist_id, :album_id
     attr_reader :name, :artist, :album, :track, :year
     attr_reader :duration, :artwork, :playcount
-  
     # Initialize a new Grooveshark::Song object
     #
     # client - Grooveshark::Client
@@ -15,13 +14,10 @@ module Grooveshark
       end
       
       @client = client
-      
       unless data.nil?
         @id         = data['song_id']
         @name       = data['song_name'] || data['name']
-        @artist     = data['artist_name']
         @artist_id  = data['artist_id']
-        @album      = data['album_name']
         @album_id   = data['album_id']
         @track      = data['track_num']
         @duration   = data['estimate_duration']
@@ -49,6 +45,14 @@ module Grooveshark
         'albumID'     => @album_id,
         'track'       => @track
       }
+    end
+    
+    def artist
+      @artist ||= @client.get_artist_by_id(@artist_id)
+    end
+    
+    def album
+      @album ||= @client.get_album_by_id(@album_id)
     end
     
     # Returns a direct streaming URL

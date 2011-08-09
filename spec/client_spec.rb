@@ -92,4 +92,5 @@ describe 'Client' do
     url.nil?.should == false
     url.should match /^http:/i
   end
+  
 end
