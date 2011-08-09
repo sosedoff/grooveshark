@@ -17,8 +17,8 @@ module Grooveshark
       
       @client = client
       unless data.nil?
-        @album_id             = data['album_id'].to_i
-        @album_name_id        = data['album_name_id'].to_i
+        @id                   = data['album_id'].to_i
+        @name_id              = data['album_name_id'].to_i
         @name                 = data['name']
         @artist_id            = data['artist_id'].to_i
         @year                 = data['year']
@@ -34,12 +34,25 @@ module Grooveshark
       [@album_id, @name].join(' - ')
     end
     
+    # Returns a hash formatted for API usage
+    # 
+    def to_hash
+      {
+        'albumID'          => @id,
+        'albumNameID'      => @name_id,
+        'artistID'         => @artist_id,
+        'year'             => @year,
+        'coverArtFilename' => @cover_art_filename,
+        'artistName'       => @artist_name
+      }
+    end
+    
     # Returns (and if possible stores) the album songs
     #
     # @return [Array]
     #
     def songs
-      @songs ||= @client.get_songs_by_album_id(@album_id)
+      @songs ||= @client.get_songs_by_album_id(@id)
     end
     
   end

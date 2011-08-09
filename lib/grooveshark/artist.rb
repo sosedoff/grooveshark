@@ -16,5 +16,15 @@ module Grooveshark
       @id     = Integer(data['artist_id'] || data['id'])
       @name   = data['artist_name'] || data['name']
     end
+    
+    # Returns a hash formatted for API usage
+    # 
+    def to_hash
+      {
+        'artistID'    => @id,
+        'Name'        => @name
+      }
+    end
+    
   end
 end

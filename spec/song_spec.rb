@@ -47,6 +47,10 @@ describe "Song" do
       songs = @song.album.songs.map { |s| s.id }
       songs.include?(@song.id.to_s).should be_true
     end
+    
+    it "should not have any nil instance variables" do
+      @song.album.to_hash.each { |k,v| v.should_not be_nil, "#{k} is nil!" }
+    end
   end
   
   context "artist" do
@@ -58,6 +62,10 @@ describe "Song" do
       artist = @song.artist
       artist.id.to_s.should == '1254743'
       artist.name.should == 'Bruno Mars'
+    end
+    
+    it "should not have any nil instance variables" do
+      @song.artist.to_hash.each { |k,v| v.should_not be_nil, "#{k} is nil!" }
     end
   end
   
