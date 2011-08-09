@@ -118,6 +118,29 @@ module Grooveshark
       "http://#{auth['ip']}/stream.php?streamKey=#{auth['stream_key']}"
     end
     
+    # Returns an album object
+    #
+    # id - album id from song
+    #
+    # @return Grooveshark::Album
+    #
+    def get_album_by_id(id)
+      Album.new(self, request('getAlbumByID', { :albumID => id }))
+    end
+    
+    # Returns an array of Song objects
+    #
+    # id - the album id
+    #
+    # @return [Array]
+    #
+    def get_songs_by_album_id(id)
+      songs = []
+      request('albumGetSongs', {:albumID => id, :isVerified => true, :offset => 0})['songs'].each { |s| songs << Song.new(self, s)}
+      
+      return songs
+    end
+    
     protected
     
     # Returns a collection of search results
@@ -135,20 +158,5 @@ module Grooveshark
       request('getSearchResults', {:type => type, :query => query})[type.downcase]
     end
     
-    def get_album(song)
-      return get_album_by_id(song.album_id)
-    end
-    
-    def get_songs_by_album_id(id)
-      songs = []
-      request('albumGetSongs', {:albumID => id, :isVerified => true, :offset => 0})['songs'].each { |s| songs << Song.new(s)}
-      return songs
-    end
-    
-    # Get album from album_id
-    def get_album_by_id(id)
-      desc = request('getAlbumByID', { :albumID => id })
-      return Album.new(desc, get_songs_by_album_id(id))
-    end
   end
 end

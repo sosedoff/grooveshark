@@ -93,21 +93,4 @@ describe 'Client' do
     url.should match /^http:/i
   end
   
-  context "album from id" do
-    before(:all) do
-      @gs = Grooveshark::Client.new
-      @song = @gs.search_songs('Nirvana')[0]
-    end
-    
-    it "should return album object with same album_id of a song" do
-      album = @gs.get_album(@song)
-      album.should be_a_kind_of Grooveshark::Album
-      album.album_id.should == @song.album_id
-    end
-    
-    it "should include the song originally requested" do
-      songs = @gs.get_album(@song).songs.map { |s| s.name }
-      songs.include?(@song.name).should be_true
-    end
-  end
 end

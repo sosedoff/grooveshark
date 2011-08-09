@@ -19,7 +19,6 @@ module Grooveshark
         @name       = data['song_name'] || data['name']
         @artist     = data['artist_name']
         @artist_id  = data['artist_id']
-        @album      = data['album_name']
         @album_id   = data['album_id']
         @track      = data['track_num']
         @duration   = data['estimate_duration']
@@ -47,6 +46,10 @@ module Grooveshark
         'albumID'     => @album_id,
         'track'       => @track
       }
+    end
+    
+    def album
+      @album ||= @client.get_album_by_id(@album_id)
     end
     
     # Returns a direct streaming URL
