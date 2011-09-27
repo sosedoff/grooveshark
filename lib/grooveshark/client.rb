@@ -76,7 +76,7 @@ module Grooveshark
       
     # Perform search request for query
     def search(type, query)
-      results = request('getSearchResults', {:type => type, :query => query})['songs']
+      results = request('getSearchResults', {:type => type, :query => query})['songs']['songs']
       results.map { |song| Song.new song }
     end
     
