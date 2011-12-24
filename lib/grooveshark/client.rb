@@ -6,9 +6,9 @@ module Grooveshark
     attr_reader :user
     attr_reader :comm_token_ttl
   
-    SALT = 'backToTheScienceLab'
+    SALT = 'imOnAHorse'
     METHOD_SALTS = { 
-      'getStreamKeyFromSongIDEx' => 'bewareOfBearsharktopus'
+      'getStreamKeyFromSongIDEx' => 'theTicketsAreNowDiamonds'
     }
   
     def initialize(session=nil)
