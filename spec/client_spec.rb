@@ -7,6 +7,12 @@ describe 'Client' do
       @gs.session.should_not == nil
       @gs.session.should match /^[abcdef\d]{32}$/i
     end
+
+    it 'should have a valid token' do
+      @gs = Grooveshark::Client.new
+      @gs.comm_token.should_not == nil
+      @gs.comm_token.should match /^[abcdef\d]{13}$/i
+    end
   end
   
   context 'authentication' do
@@ -31,6 +37,14 @@ describe 'Client' do
       songs = @gs.search_songs('Nirvana')
       songs.should be_a_kind_of Array
       songs.size.should_not == 0
+    end
+  end
+
+  context 'song URL' do
+    it 'should return a valid URL' do
+      gs = Grooveshark::Client.new
+      song = gs.search_songs('Daft Punk').first
+      print gs.get_song_url(song) # An exception is raised on error
     end
   end
 end
