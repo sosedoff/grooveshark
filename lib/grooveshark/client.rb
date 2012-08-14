@@ -20,8 +20,10 @@ module Grooveshark
     
     # Obtain new session from Grooveshark
     def get_session
-      resp = RestClient.get('http://listen.grooveshark.com')
-      resp.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
+      # Avoid an extra request
+      # resp = RestClient.get('http://listen.grooveshark.com')
+      # resp.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
+      get_random_hex_chars(32)
     end
     
     # Get communication token
@@ -38,6 +40,11 @@ module Grooveshark
       plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
+    end
+
+    def get_random_hex_chars(length)
+      chars = ('a'..'f').to_a | (0..9).to_a
+      (0...length).map { chars[rand(chars.length)] }.join
     end
     
     public
