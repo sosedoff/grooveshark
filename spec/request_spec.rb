@@ -3,7 +3,9 @@ require File.expand_path("./helper", File.dirname(__FILE__))
 describe 'Request' do
   module Grooveshark
     module Request
-      TOKEN_TTL = 1 # override default ttl for tests
+      # Override default ttl for tests
+      remove_const :TOKEN_TTL # Avoid the "already initialized constant" warning
+      TOKEN_TTL = 1
     end
   end
   
