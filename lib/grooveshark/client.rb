@@ -6,11 +6,6 @@ module Grooveshark
     attr_reader :user
     attr_reader :comm_token_ttl
   
-    SALT = 'imOnAHorse'
-    METHOD_SALTS = { 
-      'getStreamKeyFromSongIDEx' => 'theTicketsAreNowDiamonds'
-    }
-  
     def initialize(session=nil)
       @session = session || get_session
       get_comm_token
@@ -35,8 +30,8 @@ module Grooveshark
     
     # Sign method
     def create_token(method)
-      rnd = rand(256**3).to_s(16).rjust(6, '0')
-      salt = METHOD_SALTS.key?(method) ? METHOD_SALTS[method] : SALT
+      rnd = get_random_hex_chars(6)
+      salt = get_method_salt(method)
       plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
@@ -83,7 +78,7 @@ module Grooveshark
       
     # Perform search request for query
     def search(type, query)
-      results = request('getSearchResults', {:type => type, :query => query})['songs']
+      results = request('getResultsFromSearch', {:type => type, :query => query})['result']
       results.map { |song| Song.new song }
     end
     
@@ -99,12 +94,18 @@ module Grooveshark
     
     # Get stream authentication by song ID
     def get_stream_auth_by_songid(song_id)
-      request('getStreamKeyFromSongIDEx', {
-        'songID'    => song_id,
-        'prefetch'  => false,
-        'mobile'    => false,
-        'country'   => COUNTRY
+      result = request('getStreamKeysFromSongIDs', {
+        'type' => 8,
+        'mobile' => false,
+        'prefetch' => false,
+        'songIDs' => [song_id],
+        'country' => COUNTRY
       })
+      song_data = result[song_id.to_s]
+      if not song_data or song_data == [] then
+        raise GeneralError, "No data for this song. Maybe Grooveshark blocked your IP."
+      end
+      song_data
     end
   
     # Get stream authentication for song object
@@ -121,6 +122,17 @@ module Grooveshark
     # Get song stream
     def get_song_url(song)
       get_song_url_by_id(song.id)
+    end
+
+    private
+
+    def get_method_salt(method)
+      case method
+      when 'getStreamKeysFromSongIDs'
+        'circlesAndSquares'
+      else
+        'reallyHotSauce'
+      end
     end
   end
 end
