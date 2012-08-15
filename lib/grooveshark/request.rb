@@ -36,7 +36,7 @@ module Grooveshark
           'Accept-Encoding' => 'gzip'
         })
       rescue Exception => ex
-        raise GeneralError    # Need define error handling
+        raise GeneralError, ex.message
       end
 
       data = JSON.parse(data)
