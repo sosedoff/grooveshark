@@ -1,13 +1,5 @@
 module Grooveshark
   module Request
-    COUNTRY = {
-      'CC1' => 72057594037927940, 
-      'CC2' => 0, 
-      'CC3' => 0, 
-      'CC4' => 0, 
-      'ID' => 57,
-      'IPR' => 0 
-    }
     TOKEN_TTL = 120 # 2 minutes
     
     # Perform API request
@@ -19,10 +11,10 @@ module Grooveshark
         'header' => {
           'client' => get_method_client(method),
           'clientRevision' => get_method_client_revision(method),
-          'country' => COUNTRY,
+          'country' => @country,
           'privacy' => 0,
           'session' => @session,
-          'uuid' => 'A3B724BA-14F5-4932-98B8-8D375F85F266',
+          'uuid' => @uuid
         },
         'method' => method,
         'parameters' => params
@@ -31,9 +23,9 @@ module Grooveshark
 
       begin
         data = RestClient.post(url, body.to_json, {
-          'User-Agent' => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.56 Safari/536.5",
+          'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.77 Safari/537.1',
           'Content-Type' => 'application/json',
-          'Accept-Encoding' => 'gzip'
+          'Referer' => get_method_referer(method)
         })
       rescue Exception => ex
         raise GeneralError, ex.message
@@ -57,21 +49,23 @@ module Grooveshark
     private
 
     def get_method_client(method)
-      case method
-      when 'getStreamKeysFromSongIDs'
-        'jsqueue'
-      else
-        'htmlshark'
-      end
+      jsqueue_methods = [
+        'getStreamKeyFromSongIDEx', 
+        'addSongsToQueue', 
+        'markSongDownloadedEx', 
+        'markStreamKeyOver30Seconds', 
+        'markSongQueueSongPlayed',
+        'markSongComplete'
+      ]
+      jsqueue_methods.include?(method) ? 'jsqueue' : 'htmlshark'
     end
 
     def get_method_client_revision(method)
-      case get_method_client(method)
-      when 'jsqueue'
-        '20120312.08'
-      else
-        20120312
-      end
+      get_method_client(method) == 'jsqueue' ? '20120227' : '20120227.01'
+    end
+
+    def get_method_referer(method)
+      "http://grooveshark.com/JSQueue.swf?20120521.02" if get_method_client(method) == 'jsqueue'
     end
   end
 end

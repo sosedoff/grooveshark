@@ -3,27 +3,28 @@ module Grooveshark
     include Grooveshark::Request
     
     attr_accessor :session, :comm_token
-    attr_reader :user
-    attr_reader :comm_token_ttl
+    attr_reader :user, :comm_token_ttl, :country
   
     def initialize(session=nil)
-      @session = session || get_session
+      @session, @country = get_session_and_country
+      @uuid = UUID.new.generate.upcase
       get_comm_token
     end
     
     protected
-    
-    # Obtain new session from Grooveshark
-    def get_session
-      # Avoid an extra request
-      # resp = RestClient.get('http://listen.grooveshark.com')
-      # resp.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
-      get_random_hex_chars(32)
+
+    def get_session_and_country
+      response = RestClient.get('http://grooveshark.com')
+      session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
+      config_json = response.to_s.scan(/window.gsConfig = ({.*?});/).flatten.first
+      raise GeneralError, "gsConfig not found" if not config_json
+      config = JSON.parse(config_json)
+      [session, config['country']]
     end
     
     # Get communication token
     def get_comm_token
-      @comm_token = nil
+      @comm_token = nil # request() uses it
       @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
       @comm_token_ttl = Time.now.to_i
     end
@@ -94,25 +95,24 @@ module Grooveshark
     
     # Get stream authentication by song ID
     def get_stream_auth_by_songid(song_id)
-      result = request('getStreamKeysFromSongIDs', {
-        'type' => 8,
-        'mobile' => false,
+      result = request('getStreamKeyFromSongIDEx', {
+        'type' => 0,
         'prefetch' => false,
-        'songIDs' => [song_id],
-        'country' => COUNTRY
+        'songID' => song_id,
+        'country' => @country,
+        'mobile' => false,
       })
-      song_data = result[song_id.to_s]
-      if not song_data or song_data == [] then
-        raise GeneralError, "No data for this song. Maybe Grooveshark blocked your IP."
+      if result == [] then
+        raise GeneralError, "No data for this song. Maybe Grooveshark banned your IP."
       end
-      song_data
+      result
     end
   
     # Get stream authentication for song object
     def get_stream_auth(song)
       get_stream_auth_by_songid(song.id)
     end
-    
+
     # Get song stream url by ID
     def get_song_url_by_id(id)
       resp = get_stream_auth_by_songid(id)
@@ -127,12 +127,7 @@ module Grooveshark
     private
 
     def get_method_salt(method)
-      case method
-      when 'getStreamKeysFromSongIDs'
-        'circlesAndSquares'
-      else
-        'reallyHotSauce'
-      end
+      get_method_client(method) == 'jsqueue' ? 'spiralLightbulbs' : 'riceAndChicken'
     end
   end
 end
