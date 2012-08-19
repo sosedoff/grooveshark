@@ -3,41 +3,44 @@ module Grooveshark
     include Grooveshark::Request
     
     attr_accessor :session, :comm_token
-    attr_reader :user
-    attr_reader :comm_token_ttl
-  
-    SALT = 'imOnAHorse'
-    METHOD_SALTS = { 
-      'getStreamKeyFromSongIDEx' => 'theTicketsAreNowDiamonds'
-    }
+    attr_reader :user, :comm_token_ttl, :country
   
     def initialize(session=nil)
-      @session = session || get_session
+      @session, @country = get_session_and_country
+      @uuid = UUID.new.generate.upcase
       get_comm_token
     end
     
     protected
-    
-    # Obtain new session from Grooveshark
-    def get_session
-      resp = RestClient.get('http://listen.grooveshark.com')
-      resp.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
+
+    def get_session_and_country
+      response = RestClient.get('http://grooveshark.com')
+      session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
+      config_json = response.to_s.scan(/window.gsConfig = ({.*?});/).flatten.first
+      raise GeneralError, "gsConfig not found" if not config_json
+      config = JSON.parse(config_json)
+      [session, config['country']]
     end
     
     # Get communication token
     def get_comm_token
-      @comm_token = nil
+      @comm_token = nil # request() uses it
       @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
       @comm_token_ttl = Time.now.to_i
     end
     
     # Sign method
     def create_token(method)
-      rnd = rand(256**3).to_s(16).rjust(6, '0')
-      salt = METHOD_SALTS.key?(method) ? METHOD_SALTS[method] : SALT
+      rnd = get_random_hex_chars(6)
+      salt = get_method_salt(method)
       plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
+    end
+
+    def get_random_hex_chars(length)
+      chars = ('a'..'f').to_a | (0..9).to_a
+      (0...length).map { chars[rand(chars.length)] }.join
     end
     
     public
@@ -76,7 +79,7 @@ module Grooveshark
       
     # Perform search request for query
     def search(type, query)
-      results = request('getSearchResults', {:type => type, :query => query})['songs']
+      results = request('getResultsFromSearch', {:type => type, :query => query})['result']
       results.map { |song| Song.new song }
     end
     
@@ -92,19 +95,24 @@ module Grooveshark
     
     # Get stream authentication by song ID
     def get_stream_auth_by_songid(song_id)
-      request('getStreamKeyFromSongIDEx', {
-        'songID'    => song_id,
-        'prefetch'  => false,
-        'mobile'    => false,
-        'country'   => COUNTRY
+      result = request('getStreamKeyFromSongIDEx', {
+        'type' => 0,
+        'prefetch' => false,
+        'songID' => song_id,
+        'country' => @country,
+        'mobile' => false,
       })
+      if result == [] then
+        raise GeneralError, "No data for this song. Maybe Grooveshark banned your IP."
+      end
+      result
     end
   
     # Get stream authentication for song object
     def get_stream_auth(song)
       get_stream_auth_by_songid(song.id)
     end
-    
+
     # Get song stream url by ID
     def get_song_url_by_id(id)
       resp = get_stream_auth_by_songid(id)
@@ -114,6 +122,12 @@ module Grooveshark
     # Get song stream
     def get_song_url(song)
       get_song_url_by_id(song.id)
+    end
+
+    private
+
+    def get_method_salt(method)
+      get_method_client(method) == 'jsqueue' ? 'spiralLightbulbs' : 'riceAndChicken'
     end
   end
 end
