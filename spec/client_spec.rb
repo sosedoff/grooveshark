@@ -48,7 +48,7 @@ describe 'Client' do
 
   context 'download' do
     it 'should download without being banned' do
-      4.times do # Not passing the streamKey as a payload bans the IP after 3 requests
+      4.times do # Usually the IP is banned on the 4th request on protocol mismatch
         gs = Grooveshark::Client.new
         # Try with a short song (this one is about a minute long)
         song = gs.search_songs("Alan Reeves The Chase").first
