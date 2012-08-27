@@ -21,7 +21,7 @@ module Grooveshark
     
     # Get user avatar URL
     def avatar
-      "http://beta.grooveshark.com/static/userimages/#{@id}.jpg"
+      "http://images.grooveshark.com/static/userimages/#{@id}.jpg"
     end
     
     # Get user activity for the date (COMES AS RAW RESPONSE)
