@@ -16,7 +16,7 @@ module Grooveshark
     def get_session_and_country
       response = RestClient.get('http://grooveshark.com')
       session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
-      config_json = response.to_s.scan(/window.gsConfig = ({.*?});/).flatten.first
+      config_json = response.to_s.scan(/window.gsConfig = (\{.*?\});/).flatten.first
       raise GeneralError, "gsConfig not found" if not config_json
       config = JSON.parse(config_json)
       [session, config['country']]
