@@ -129,5 +129,177 @@ module Grooveshark
     def get_method_salt(method)
       get_method_client(method) == 'jsqueue' ? 'spiralLightbulbs' : 'riceAndChicken'
     end
+
+    public
+    # "getItemByPageName" - try a username
+    def getItemByPageName(name)
+      request('getItemByPageName', {'name' => name})
+    end
+
+    # "getUserProfileFeed" - user id, and try 0 and 0 for first page
+    def getUserProfileFeed(userID, lastDocumentID, lastEventID)
+      request('getUserProfileFeed', {'userID' => userID, 'lastDocumentID' => lastDocumentID, 'lastEventID' => lastEventID})
+    end
+
+    # "getProfileFeed" - try 0 and 0 for first page (requires logged in)
+    def getProfileFeed(lastDocumentID, lastEventID)
+      request('getProfileFeed', {'lastDocumentID' => lastDocumentID, 'lastEventID' => lastEventID})
+    end
+
+    # Gets all of a user's profile feed, as an array of the pages returned individually.
+    # Useful for obtaining a log of what you've ever listened to, as far back as can be had,
+    # since I think Grooveshark's been removing songs and all traces of them except for the logs.
+    # I wanted to have a list of what songs used to be on my favorites list, before Grooveshark
+    # erased them.  Warning: it will probably be a large list.
+    def getAllUserFeed(userID)
+      i = 0
+      feed = Array.new
+      feed[i] = getUserProfileFeed(userID, 0, 0)
+      count = feed[i]["count"]
+      i += 1
+      while count > 0
+        feed[i] = getUserProfileFeed(userID, feed[i-1]["last_document_id"], feed[i-1]["last_event_id"])
+        count = feed[i]["count"]
+        i += 1
+      end
+      feed
+    end
+
+# streamServerID is actually "ip" as returned from getStreamKeyFromSongIDEx
+def markSongDownloadedEx(streamKey, streamServerID, songID)
+  request('markSongDownloadedEx', {'streamKey' => streamKey, 'streamServerID' => streamServerID, 'songID' => songID})
+end
+
+# streamServerID is actually "ip" as returned from getStreamKeyFromSongIDEx
+# no idea where songQueueID comes from
+# songQueueSongID is the song's place in the queue
+def markQueueSongPlayed(streamKey, streamServerID, songID, songQueueID, songQueueSongID)
+  request('markQueueSongPlayed', {'streamKey' => streamKey, 'streamServerID' => streamServerID, 'songID' => songID, 'songQueueID' => songQueueID, 'songQueueSongID' => songQueueSongID})
+end
+
+# streamServerID is actually "ip" as returned from getStreamKeyFromSongIDEx
+# no idea where songQueueID comes from
+# songQueueSongID is the song's place in the queue
+def markStreamKeyOver30Seconds(streamKey, streamServerID, songID, songQueueID, songQueueSongID)
+  request('markStreamKeyOver30Seconds', {'streamKey' => streamKey, 'streamServerID' => streamServerID, 'songID' => songID, 'songQueueID' => songQueueID, 'songQueueSongID' => songQueueSongID})
+end
+
+# markSongComplete takes crazy input.  I can't tell you exactly how to get what it's asking for, yet.
+# Here's my notes, though.
+#markSongComplete
+#	streamKey
+#	song (bunch of data about the song)
+#	streamServerID (actually "ip" as returned from getStreamKeyFromSongIDEx)
+#	songID
+#	context
+#		type (eg., "user")
+#		data
+#			userID
+#			location
+#			picture
+#			client
+#			userName
+#			isPremium
+#	user
+#		userID
+#		picture
+#		username
+#		isPremium
+def markSongComplete(streamKey, song, streamServerID, songID, context, user)
+  request('markSongComplete', {'streamKey' => streamKey, 'song' => song, 'streamServerID' => streamServerID, 'songID' => songID, 'context' => context, 'user' => user})
+end
+
+def getAlbumByID(albumID)
+  request('getAlbumByID', {'albumID' => albumID})
+end
+
+def albumGetAllSongs(albumID)
+  request('albumGetAllSongs', {'albumID' => albumID})
+end
+    
+def userGetPlaylists(userID)
+  request('userGetPlaylists', {'userID' => userID})
+end
+
+# ofWhat is one of ["Albums", "Artists", "Playlists", "Songs", "Users"]
+def getFavorites(userID, ofWhat)
+  request('getFavorites', {'userID' => userID, 'ofWhat' => ofWhat})
+end
+
+# requires logged in
+def getUserSidebar
+  request('getUserSidebar', {})
+end
+
+# no idea what this even does
+def userGetLibraryTSModified(userID)
+  request('userGetLibraryTSModified', {'userID' => userID})
+end
+
+# The examples of type that I've seen have all been "user"
+def getPageInfoByIDType(id, type)
+  request('getPageInfoByIDType', {'id' => id, 'type' => type})
+end
+
+# songIDs is an array of song ids
+def getQueueSongListFromSongIDs(songIDs)
+  request('getQueueSongListFromSongIDs', {'songIDs' => songIDs})
+end
+
+# requires logged in
+def getUserNotifications
+  request('getUserNotifications', {})
+end
+
+# dunno where songQueueID comes from.
+# songIDsArtistIDs is an map of {'source', 'artistID', 'songID', 'songQueueSongID'};
+# 'source' was 'user' wherever I saw it, and 'songQueueSongID' was the song's place in the queue.
+def addSongsToQueue(songQueueID, songIDsArtistIDs)
+  request('addSongsToQueue', {'songQueueID' => songQueueID, 'songIDsArtistIDs' => songIDsArtistIDs})
+end
+
+# I dunno what this does; I only ever saw it used once.
+def getTokenForSong(songID, country)
+  request('getTokenForSong', {'songID' => songID, 'country' => country})
+end
+
+# type always seems to be 'artist'.
+def getAutocomplete(query, type)
+  request('getAutocomplete', {'query' => query, 'type' => type})
+end
+
+# Raw search.  Type can be an array of any of ["Songs", "Albums", "Artists", "Playlists", "Users", "EventsAndDarFM"]
+# and maybe others.  I don't know what 'guts' and 'ppOverride' do, but they were usually 0 and "" respectively.
+def getResultsFromSearch(query, type, guts, ppOverride)
+  request('getResultsFromSearch', {'query' => query, 'type' => type, 'guts' => guts, 'ppOverride' => ppOverride})
+end
+
+# It's like the singular version, except with an array of songIDs.
+    def getStreamKeysFromSongIDs(songIDs)
+      result = request('getStreamKeyFromSongIDEx', {
+        'type' => 0,
+        'prefetch' => false,
+        'songIDs' => songIDs,
+        'country' => @country,
+        'mobile' => false,
+      })
+      if result == [] then
+        raise GeneralError, "No data for this song. Maybe Grooveshark banned your IP."
+      end
+      result
+    end
+
+def playlistGetSongs(playlistID)
+  request('playlistGetSongs', {'playlistID' => playlistID})
+end
+
+def playlistGetFans(playlistID)
+  request('playlistGetFans', {'playlistID' => playlistID})
+end
+
+def userGetSongsInLibrary(userID, page)
+  request('userGetSongsInLibrary', {'userID' => userID, 'page' => page})
+end
+
   end
 end
