@@ -22,11 +22,7 @@ module Grooveshark
       body['header']['token'] = create_token(method) if @comm_token
 
       begin
-        data = RestClient.post(url, body.to_json, {
-          'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.77 Safari/537.1',
-          'Content-Type' => 'application/json',
-          'Referer' => get_method_referer(method)
-        })
+        data = RestClient.post(url, body.to_json, {'Content-Type' => 'application/json'})
       rescue Exception => ex
         raise GeneralError, ex.message
       end
@@ -61,11 +57,7 @@ module Grooveshark
     end
 
     def get_method_client_revision(method)
-      get_method_client(method) == 'jsqueue' ? '20120227' : '20120227.01'
-    end
-
-    def get_method_referer(method)
-      "http://grooveshark.com/JSQueue.swf?20120521.02" if get_method_client(method) == 'jsqueue'
+      get_method_client(method) == 'jsqueue' ? '20120312.02' : '20120312'
     end
   end
 end

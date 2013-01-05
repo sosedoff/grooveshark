@@ -127,7 +127,7 @@ module Grooveshark
     private
 
     def get_method_salt(method)
-      get_method_client(method) == 'jsqueue' ? 'spiralLightbulbs' : 'riceAndChicken'
+      get_method_client(method) == 'jsqueue' ? 'closeButNoCigar' : 'breakfastBurritos'
     end
   end
 end
