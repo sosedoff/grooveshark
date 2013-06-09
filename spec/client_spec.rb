@@ -49,7 +49,7 @@ describe 'Client' do
   context 'download' do
     it 'should download without being banned' do
       gs = Grooveshark::Client.new
-      ten_minutes_later = Time.new + 15 * 60 # Usually IP is banned after about 10 minutes
+      ten_minutes_later = Time.new + 15 * 60 # Usually IP is banned after about 15 minutes
       while Time.new < ten_minutes_later do
         # Try with a short song (this one is about a minute long)
         song = gs.search_songs("Alan Reeves The Chase").first
