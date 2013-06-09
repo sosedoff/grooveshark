@@ -5,7 +5,7 @@ module Grooveshark
     attr_accessor :session, :comm_token
     attr_reader :user, :comm_token_ttl, :country
   
-    def initialize(session=nil)
+    def initialize()
       @session, @country = get_session_and_country
       @uuid = UUID.new.generate.upcase
       get_comm_token
