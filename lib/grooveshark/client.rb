@@ -32,7 +32,7 @@ module Grooveshark
     # Sign method
     def create_token(method)
       rnd = get_random_hex_chars(6)
-      salt = get_method_salt(method)
+      salt = 'gooeyFlubber'
       plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
@@ -122,12 +122,6 @@ module Grooveshark
     # Get song stream
     def get_song_url(song)
       get_song_url_by_id(song.id)
-    end
-
-    private
-
-    def get_method_salt(method)
-      get_method_client(method) == 'jsqueue' ? 'closeButNoCigar' : 'breakfastBurritos'
     end
   end
 end

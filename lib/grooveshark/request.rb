@@ -9,8 +9,8 @@ module Grooveshark
       url = "#{secure ? 'https' : 'http'}://grooveshark.com/more.php?#{method}"
       body = {
         'header' => {
-          'client' => get_method_client(method),
-          'clientRevision' => get_method_client_revision(method),
+          'client' => 'mobileshark',
+          'clientRevision' => '20120830',
           'country' => @country,
           'privacy' => 0,
           'session' => @session,
@@ -40,24 +40,6 @@ module Grooveshark
     # Refresh communications token on ttl
     def refresh_token
       get_comm_token if Time.now.to_i - @comm_token_ttl > TOKEN_TTL
-    end
-
-    private
-
-    def get_method_client(method)
-      jsqueue_methods = [
-        'getStreamKeyFromSongIDEx', 
-        'addSongsToQueue', 
-        'markSongDownloadedEx', 
-        'markStreamKeyOver30Seconds', 
-        'markSongQueueSongPlayed',
-        'markSongComplete'
-      ]
-      jsqueue_methods.include?(method) ? 'jsqueue' : 'htmlshark'
-    end
-
-    def get_method_client_revision(method)
-      get_method_client(method) == 'jsqueue' ? '20120312.02' : '20120312'
     end
   end
 end
