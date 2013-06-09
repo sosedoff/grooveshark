@@ -11,40 +11,6 @@ module Grooveshark
       get_comm_token
     end
     
-    protected
-
-    def get_session_and_country
-      response = RestClient.get('http://grooveshark.com')
-      session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
-      config_json = response.to_s.scan(/window.gsConfig = (\{.*?\});/).flatten.first
-      raise GeneralError, "gsConfig not found" if not config_json
-      config = JSON.parse(config_json)
-      [session, config['country']]
-    end
-    
-    # Get communication token
-    def get_comm_token
-      @comm_token = nil # request() uses it
-      @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
-      @comm_token_ttl = Time.now.to_i
-    end
-    
-    # Sign method
-    def create_token(method)
-      rnd = get_random_hex_chars(6)
-      salt = 'gooeyFlubber'
-      plain = [method, @comm_token, salt, rnd].join(':')
-      hash = Digest::SHA1.hexdigest(plain)
-      "#{rnd}#{hash}"
-    end
-
-    def get_random_hex_chars(length)
-      chars = ('a'..'f').to_a | (0..9).to_a
-      (0...length).map { chars[rand(chars.length)] }.join
-    end
-    
-    public
-    
     # Authenticate user
     def login(user, password)
       data = request('authenticateUser', {:username => user, :password => password}, true)
@@ -124,6 +90,38 @@ module Grooveshark
       get_song_url_by_id(song.id)
     end
 
+    protected
+
+    def get_session_and_country
+      response = RestClient.get('http://grooveshark.com')
+      session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
+      config_json = response.to_s.scan(/window.gsConfig = (\{.*?\});/).flatten.first
+      raise GeneralError, "gsConfig not found" if not config_json
+      config = JSON.parse(config_json)
+      [session, config['country']]
+    end
+    
+    # Get communication token
+    def get_comm_token
+      @comm_token = nil # request() uses it
+      @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
+      @comm_token_ttl = Time.now.to_i
+    end
+    
+    # Sign method
+    def create_token(method)
+      rnd = get_random_hex_chars(6)
+      salt = 'gooeyFlubber'
+      plain = [method, @comm_token, salt, rnd].join(':')
+      hash = Digest::SHA1.hexdigest(plain)
+      "#{rnd}#{hash}"
+    end
+
+    def get_random_hex_chars(length)
+      chars = ('a'..'f').to_a | (0..9).to_a
+      (0...length).map { chars[rand(chars.length)] }.join
+    end
+    
     private
 
     # Perform API request
