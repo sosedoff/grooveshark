@@ -26,6 +26,20 @@ describe 'Client' do
       @gs = Grooveshark::Client.new
       lambda { @gs.login('invlid_user_name', 'invalid_password') }.should raise_error Grooveshark::InvalidAuthentication
     end
+
+    it 'should obtain a new communication token on TTL expiration' do
+      @gs = Grooveshark::Client.new(:ttl => 1)
+      @tokens = []
+      
+      3.times do |i|
+        @gs.search_songs('Muse')
+        @tokens << @gs.comm_token
+        sleep 3
+      end
+      
+      @tokens.uniq!
+      @tokens.size.should == 3
+    end
   end
   
   context 'search' do

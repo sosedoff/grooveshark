@@ -1,11 +1,10 @@
 module Grooveshark
   class Client
-    TOKEN_TTL = 120 # 2 minutes
-    
     attr_accessor :session, :comm_token
     attr_reader :user, :comm_token_ttl, :country
   
-    def initialize()
+    def initialize(params)
+      @ttl = params[:ttl] || 120 # 2 minutes
       @session, @country = get_session_and_country
       @uuid = UUID.new.generate.upcase
       get_comm_token
@@ -161,7 +160,7 @@ module Grooveshark
     
     # Refresh communications token on ttl
     def refresh_token
-      get_comm_token if Time.now.to_i - @comm_token_ttl > TOKEN_TTL
+      get_comm_token if Time.now.to_i - @comm_token_ttl > @ttl
     end
   end
 end
