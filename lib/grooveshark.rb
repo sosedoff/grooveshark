@@ -5,7 +5,6 @@ require 'uuid'
 
 require 'grooveshark/utils'
 require 'grooveshark/errors'
-require 'grooveshark/request'
 require 'grooveshark/client'
 require 'grooveshark/user'
 require 'grooveshark/playlist'
