@@ -89,8 +89,6 @@ module Grooveshark
       get_song_url_by_id(song.id)
     end
 
-    protected
-
     def get_session_and_country
       response = RestClient.get('http://grooveshark.com')
       session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
@@ -120,8 +118,6 @@ module Grooveshark
       chars = ('a'..'f').to_a | (0..9).to_a
       (0...length).map { chars[rand(chars.length)] }.join
     end
-    
-    private
 
     # Perform API request
     def request(method, params={}, secure=false)
