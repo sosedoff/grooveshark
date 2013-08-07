@@ -20,7 +20,7 @@ module Grooveshark
 
     # Fetch playlist songs
     def load_songs
-      @songs = @client.request('playlistGetSongs', :playlistID => @id)['songs']
+      @songs = @client.request('getPlaylistByID', :playlistID => @id)['songs']
       @songs.map! { |s| Song.new(s) }
     end
     
