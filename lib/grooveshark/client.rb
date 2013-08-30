@@ -5,6 +5,7 @@ module Grooveshark
 
     def initialize(params = {})
       @ttl = params[:ttl] || 120 # 2 minutes
+      RestClient.proxy = params[:proxy] if params[:proxy]
       @session, @country = get_session_and_country
       @uuid = UUID.new.generate.upcase
       get_comm_token
