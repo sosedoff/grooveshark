@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Dan Sosedoff"]
   s.email       = "dan.sosedoff@gmail.com"
   s.homepage    = "http://github.com/sosedoff/grooveshark"
+  s.license     = "MIT"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
