@@ -101,7 +101,7 @@ module Grooveshark
       config_json = preload_response.to_s.scan(/window.tokenData = (.*);/).flatten.first
       raise GeneralError, "gsConfig not found" if not config_json
       config = JSON.parse(config_json)['getGSConfig']
-      [session, config['country']['ID']]
+      [session, config['country']]
     end
     
     # Get communication token
