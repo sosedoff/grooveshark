@@ -6,9 +6,7 @@ module Grooveshark
     def initialize(params = {})
       @ttl = params[:ttl] || 120 # 2 minutes
       @uuid = UUID.new.generate.upcase
-#      get_session_and_country
- #     get_comm_token
-       get_token_data
+      get_token_data
     end
     
     # Authenticate user
@@ -107,29 +105,6 @@ module Grooveshark
       @country = config['country']
       @session = config['sessionID']
     end
-
-    # Get communication token
-    def get_comm_token
-      token_data = get_token_data
-      @comm_token = token_data['getCommunicationToken']
-      @comm_token_ttl = Time.now.to_i
-
-    end
-
-    # Get session and country
-    def get_session_and_country
-      token_data = get_token_data 
-      config = token_data['getGSConfig']
-      @country = config['country']
-      @session = config['sessionID']
-    end
-
-    # Get communication token
-    def get_comm_token
-      token_data = get_token_data
-      @comm_token = token_data['getCommunicationToken']
-      @comm_token_ttl = Time.now.to_i
-    end
     
     # Sign method
     def create_token(method)
@@ -181,11 +156,7 @@ module Grooveshark
     
     # Refresh communications token on ttl
     def refresh_token
-      if Time.now.to_i - @comm_token_ttl > @ttl then
- #         get_comm_token
-#          get_session_and_country
-           get_token_data
-      end
+      get_token_data if Time.now.to_i - @comm_token_ttl > @ttl
     end
   end
 end
