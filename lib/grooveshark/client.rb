@@ -5,9 +5,9 @@ module Grooveshark
   
     def initialize(params = {})
       @ttl = params[:ttl] || 120 # 2 minutes
-      @session, @country = get_session_and_country
       @uuid = UUID.new.generate.upcase
-      get_comm_token
+      parse_token_data
+      #get_comm_token
     end
     
     # Authenticate user
@@ -89,19 +89,23 @@ module Grooveshark
       get_song_url_by_id(song.id)
     end
 
-    def get_session_and_country
+    def parse_token_data
       response = RestClient.get('http://grooveshark.com')
-      session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
+      #@session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
 
       preload_regex = /gsPreloadAjax\(\{url: '\/preload.php\?(.*)&hash=' \+ clientPage\}\)/
       preload_id = response.to_s.scan(preload_regex).flatten.first
       preload_url = "http://grooveshark.com/preload.php?#{preload_id}&getCommunicationToken=1&hash=%2F"
       preload_response = RestClient.get(preload_url)
 
-      config_json = preload_response.to_s.scan(/window.tokenData = (.*);/).flatten.first
-      raise GeneralError, "gsConfig not found" if not config_json
-      config = JSON.parse(config_json)['getGSConfig']
-      [session, config['country']]
+      token_data_json = preload_response.to_s.scan(/window.tokenData = (.*);/).flatten.first
+      raise GeneralError, "token data not found" if not token_data_json
+      token_data = JSON.parse(token_data_json)
+      config = token_data['getGSConfig']
+      @country = config['country']
+      @session = config['sessionID']
+      @comm_token = token_data['getCommunicationToken']
+      @comm_token_ttl = Time.now.to_i
     end
     
     # Get communication token
@@ -114,7 +118,7 @@ module Grooveshark
     # Sign method
     def create_token(method)
       rnd = get_random_hex_chars(6)
-      salt = 'gooeyFlubber'
+      salt = "frenchFriedDogs"
       plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
@@ -133,7 +137,7 @@ module Grooveshark
       body = {
         'header' => {
           'client' => 'mobileshark',
-          'clientRevision' => '20120830',
+          'clientRevision' => '20130520',
           'country' => @country,
           'privacy' => 0,
           'session' => @session,
@@ -143,7 +147,6 @@ module Grooveshark
         'parameters' => params
       }
       body['header']['token'] = create_token(method) if @comm_token
-
       begin
         data = RestClient.post(url, body.to_json, {'Content-Type' => 'application/json'})
       rescue Exception => ex
