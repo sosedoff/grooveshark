@@ -6,8 +6,9 @@ module Grooveshark
     def initialize(params = {})
       @ttl = params[:ttl] || 120 # 2 minutes
       @uuid = UUID.new.generate.upcase
-      parse_token_data
-      #get_comm_token
+#      get_session_and_country
+ #     get_comm_token
+       get_token_data
     end
     
     # Authenticate user
@@ -89,9 +90,8 @@ module Grooveshark
       get_song_url_by_id(song.id)
     end
 
-    def parse_token_data
+    def get_token_data
       response = RestClient.get('http://grooveshark.com')
-      #@session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
 
       preload_regex = /gsPreloadAjax\(\{url: '\/preload.php\?(.*)&hash=' \+ clientPage\}\)/
       preload_id = response.to_s.scan(preload_regex).flatten.first
@@ -101,24 +101,40 @@ module Grooveshark
       token_data_json = preload_response.to_s.scan(/window.tokenData = (.*);/).flatten.first
       raise GeneralError, "token data not found" if not token_data_json
       token_data = JSON.parse(token_data_json)
+      @comm_token = token_data['getCommunicationToken']
+      @comm_token_ttl = Time.now.to_i
       config = token_data['getGSConfig']
       @country = config['country']
       @session = config['sessionID']
-      @comm_token = token_data['getCommunicationToken']
-      @comm_token_ttl = Time.now.to_i
     end
-    
+
     # Get communication token
     def get_comm_token
-      @comm_token = nil # request() uses it
-      @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
+      token_data = get_token_data
+      @comm_token = token_data['getCommunicationToken']
+      @comm_token_ttl = Time.now.to_i
+
+    end
+
+    # Get session and country
+    def get_session_and_country
+      token_data = get_token_data 
+      config = token_data['getGSConfig']
+      @country = config['country']
+      @session = config['sessionID']
+    end
+
+    # Get communication token
+    def get_comm_token
+      token_data = get_token_data
+      @comm_token = token_data['getCommunicationToken']
       @comm_token_ttl = Time.now.to_i
     end
     
     # Sign method
     def create_token(method)
       rnd = get_random_hex_chars(6)
-      salt = "frenchFriedDogs"
+      salt = "gooeyFlubber"
       plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
@@ -132,12 +148,12 @@ module Grooveshark
     # Perform API request
     def request(method, params={}, secure=false)
       refresh_token if @comm_token
-      
+
       url = "#{secure ? 'https' : 'http'}://grooveshark.com/more.php?#{method}"
       body = {
         'header' => {
           'client' => 'mobileshark',
-          'clientRevision' => '20130520',
+          'clientRevision' => '20120830',
           'country' => @country,
           'privacy' => 0,
           'session' => @session,
@@ -165,7 +181,11 @@ module Grooveshark
     
     # Refresh communications token on ttl
     def refresh_token
-      get_comm_token if Time.now.to_i - @comm_token_ttl > @ttl
+      if Time.now.to_i - @comm_token_ttl > @ttl then
+ #         get_comm_token
+#          get_session_and_country
+           get_token_data
+      end
     end
   end
 end
