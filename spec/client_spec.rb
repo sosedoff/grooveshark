@@ -17,7 +17,7 @@ describe 'Client' do
     it 'should have a valid token' do
       @gs = Grooveshark::Client.new
       @gs.comm_token.should_not == nil
-      @gs.comm_token.should match /^[abcdef\d]{13}$/i
+      @gs.comm_token.should match /^[abcdef\d]{40}$/i
     end
   end
   

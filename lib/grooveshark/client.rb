@@ -5,9 +5,8 @@ module Grooveshark
   
     def initialize(params = {})
       @ttl = params[:ttl] || 120 # 2 minutes
-      @session, @country = get_session_and_country
       @uuid = UUID.new.generate.upcase
-      get_comm_token
+      get_token_data
     end
     
     # Authenticate user
@@ -89,32 +88,28 @@ module Grooveshark
       get_song_url_by_id(song.id)
     end
 
-    def get_session_and_country
+    def get_token_data
       response = RestClient.get('http://grooveshark.com')
-      session = response.headers[:set_cookie].to_s.scan(/PHPSESSID=([a-z\d]{32});/i).flatten.first
 
       preload_regex = /gsPreloadAjax\(\{url: '\/preload.php\?(.*)&hash=' \+ clientPage\}\)/
       preload_id = response.to_s.scan(preload_regex).flatten.first
       preload_url = "http://grooveshark.com/preload.php?#{preload_id}&getCommunicationToken=1&hash=%2F"
       preload_response = RestClient.get(preload_url)
 
-      config_json = preload_response.to_s.scan(/window.tokenData = (.*);/).flatten.first
-      raise GeneralError, "gsConfig not found" if not config_json
-      config = JSON.parse(config_json)['getGSConfig']
-      [session, config['country']]
-    end
-    
-    # Get communication token
-    def get_comm_token
-      @comm_token = nil # request() uses it
-      @comm_token = request('getCommunicationToken', {:secretKey => Digest::MD5.hexdigest(@session)}, true)
+      token_data_json = preload_response.to_s.scan(/window.tokenData = (.*);/).flatten.first
+      raise GeneralError, "token data not found" if not token_data_json
+      token_data = JSON.parse(token_data_json)
+      @comm_token = token_data['getCommunicationToken']
       @comm_token_ttl = Time.now.to_i
+      config = token_data['getGSConfig']
+      @country = config['country']
+      @session = config['sessionID']
     end
     
     # Sign method
     def create_token(method)
       rnd = get_random_hex_chars(6)
-      salt = 'gooeyFlubber'
+      salt = "gooeyFlubber"
       plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
@@ -128,7 +123,7 @@ module Grooveshark
     # Perform API request
     def request(method, params={}, secure=false)
       refresh_token if @comm_token
-      
+
       url = "#{secure ? 'https' : 'http'}://grooveshark.com/more.php?#{method}"
       body = {
         'header' => {
@@ -143,7 +138,6 @@ module Grooveshark
         'parameters' => params
       }
       body['header']['token'] = create_token(method) if @comm_token
-
       begin
         data = RestClient.post(url, body.to_json, {'Content-Type' => 'application/json'})
       rescue Exception => ex
@@ -162,7 +156,7 @@ module Grooveshark
     
     # Refresh communications token on ttl
     def refresh_token
-      get_comm_token if Time.now.to_i - @comm_token_ttl > @ttl
+      get_token_data if Time.now.to_i - @comm_token_ttl > @ttl
     end
   end
 end
