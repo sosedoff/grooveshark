@@ -4,7 +4,7 @@ module Grooveshark
     attr_reader :id, :artist_id, :album_id
     attr_reader :name, :artist, :album, :track, :year
     attr_reader :duration, :artwork, :playcount
-  
+
     def initialize(data=nil)
       unless data.nil?
         @data       = data
@@ -21,12 +21,12 @@ module Grooveshark
         @year       = data['year']
       end
     end
-    
+
     # Presentable format
     def to_s
       [@id, @name, @artist].join(' - ')
     end
-    
+
     # Hash export for API usage
     def to_hash
       {
