@@ -40,7 +40,22 @@ module Grooveshark
       raise ArgumentError, 'Invalid type' unless ['daily', 'monthly'].include?(type)
       request('popularGetSongs', {:type => type})['songs'].map { |s| Song.new(s) }
     end
-      
+    
+    # Get top broadcasts
+    # count => specifies how many broadcasts to get
+    def top_broadcasts(count=10)
+      top_broadcasts = []
+      request('getTopBroadcastsCombined').each do |key,val|
+        broadcast_id = key.split(':')[1]
+        top_broadcasts.push(Broadcast.new(self, broadcast_id))
+        count -= 1
+        if count == 0
+          break
+        end
+      end
+      return top_broadcasts
+    end
+    
     # Perform search request for query
     def search(type, query)
       results = request('getResultsFromSearch', {:type => type, :query => query})['result']

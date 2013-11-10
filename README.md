@@ -152,6 +152,39 @@ Remove song from favorites:
 ```ruby
 user.remove_favorite(song) # Song object or song ID
 ```
+
+### Broadcasts
+
+Get top broadcasts:
+
+```ruby
+client.top_broadcasts.each do |b|
+  b.id                # Broadcast ID
+  b.name              # Broadcast Name
+end
+```
+
+To reload the current status of the broadcast (e.g. currently playing song,
+next song, etc.), call `reload_status` method:
+
+```ruby
+broadcast.reload_status
+```
+
+Get the current and next song for a broadcast:
+
+``ruby
+current_song = broadcast.active_song
+next_song = broadcast.next_song
+```
+
+Check whether the broadcast is currently playing:
+
+```ruby
+if broadcast.is_playing
+  # Do something e.g. get the currently playing song.
+end
+```
   
 ### User library
 
