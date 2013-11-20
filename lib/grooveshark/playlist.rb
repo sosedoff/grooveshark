@@ -3,11 +3,11 @@ module Grooveshark
     attr_reader :id, :user_id
     attr_reader :name, :about, :picture, :username
     attr_reader :songs
-    
+
     def initialize(client, data=nil, user_id=nil)
       @client = client
       @songs = []
-    
+
       if data
         @id       = data['playlist_id']
         @name     = data['name']
@@ -23,7 +23,7 @@ module Grooveshark
       @songs = @client.request('getPlaylistByID', :playlistID => @id)['songs']
       @songs.map! { |s| Song.new(s) }
     end
-    
+
     # Rename playlist
     def rename(name, description)
       begin
@@ -35,7 +35,7 @@ module Grooveshark
         return false
       end
     end
-    
+
     # Delete existing playlist
     def delete
       @client.request('deletePlaylist', {:playlistID => @id, :name => @name})
