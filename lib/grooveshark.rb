@@ -3,6 +3,7 @@ require 'json'
 require 'rest-client'
 require 'uuid'
 
+require 'grooveshark/version'
 require 'grooveshark/utils'
 require 'grooveshark/errors'
 require 'grooveshark/client'
