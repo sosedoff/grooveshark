@@ -237,16 +237,6 @@ user = client.get_user_by_username('user')
 user.feed
 ```
 
-## Known issues
-
-- Communication token gets rejected after some time. This timeframe is always different. Additional research didnt show any results.
-
-## TODO
-
-- Testing
-- Library management coverage
-- More methods
-
 ## Testing
 
 Run test suite:
