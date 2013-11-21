@@ -25,14 +25,14 @@ module Grooveshark
 
     # Reload broadcast status
     # Returns true on success. Otherwise false.
-    def reload_status()
-      begin
-        initialize(@client, nil,
-                   @client.request('broadcastStatusPoll', {:broadcastID => id}))
-        return true
-      rescue
-        return false
-      end
+    def reload_status
+      initialize(
+        @client, nil,
+        @client.request('broadcastStatusPoll', {:broadcastID => id})
+      )
+      true
+    rescue
+      false
     end
   end
 end

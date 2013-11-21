@@ -1,37 +1,39 @@
 require File.expand_path("./helper", File.dirname(__FILE__))
 
-describe 'Broadcast' do
-  context 'search' do
-    before(:all) do
-      @gs = Grooveshark::Client.new
+describe Grooveshark::Broadcast do
+  let(:client) { Grooveshark::Client.new }
+
+  describe "search" do
+    let(:result) { client.top_broadcasts(10) }
+
+    it "returns an array" do
+      expect(result).to be_an Array
+      expect(result.size).to eq 10
     end
 
-    it 'should return array of broadcasts of size 10' do
-      @top_broadcasts = @gs.top_broadcasts(10)
-      @top_broadcasts.should be_a_kind_of Array
-      @top_broadcasts.size.should == 10
-    end
-    it 'should be a Broadcast' do
-      @top_broadcasts = @gs.top_broadcasts(1)
-      @top_broadcast = @top_broadcasts[0]
-      @top_broadcast.should be_a_kind_of Grooveshark::Broadcast
+    it "includes brodcasts" do
+      all = result.all? { |item| item.kind_of?(Grooveshark::Broadcast) }
+      expect(all).to be_true
     end
   end
+  
+  describe "broadcast" do
+    let(:broadcast) { client.top_broadcasts.first }
 
-  context 'attributes' do
-    before(:all) do
-      @gs = Grooveshark::Client.new
-      @top_broadcast = @gs.top_broadcasts(1)[0]
+    it "has a valid id" do
+      expect(broadcast.id).to match /^[abcdef\d]{24}$/i
     end
 
-    it 'should have a valid id' do
-      @top_broadcast.id.should match /^[abcdef\d]{24}$/i
+    describe "#active_song" do
+      it "is a song instance" do
+        expect(broadcast.active_song).to be_a Grooveshark::Song
+      end
     end
-    it 'active_song should be a Song' do
-      @top_broadcast.active_song.should be_a_kind_of Grooveshark::Song
-    end
-    it 'next_song should be a Song' do
-      @top_broadcast.next_song.should be_a_kind_of Grooveshark::Song
+
+    describe "#next_song" do
+      it "is a song instance" do
+        expect(broadcast.active_song).to be_a Grooveshark::Song
+      end
     end
   end
 end
