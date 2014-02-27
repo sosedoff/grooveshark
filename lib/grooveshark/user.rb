@@ -90,10 +90,12 @@ module Grooveshark
     # --------------------------------------------------------------------------
 
     # Get user favorites
+    # Requires authenticated session.
     def favorites
-      return @favorites if @favorites
-      resp = @client.request('getFavorites', :ofWhat => 'Songs', :userID => @id)
-      @favorites = resp.map { |s| Song.new(s) }
+      @favorites ||= begin
+        resp = @client.request('getUserFavoriteSongs')
+        resp['songs'].map { |s| Song.new(s) }
+      end
     end
 
     # Add song to favorites
