@@ -3,17 +3,23 @@ module Grooveshark
     attr_accessor :session, :comm_token
     attr_reader :user, :comm_token_ttl, :country
 
-    def initialize(params = {})
+    def initialize(public_key, secret_key, params = {})
+      @public_key = public_key
+      @secret_key = secret_key
       @ttl = params[:ttl] || 120 # 2 minutes
       @uuid = UUID.new.generate.upcase
       get_token_data
     end
 
     # Authenticate user
-    def login(user, password)
-      data = request('authenticateUser', {:username => user, :password => password}, true)
+    # Usage:
+    # - login(username, password)
+    # - login(username, password_md5_hash, true)
+    def login(user, password, md5_hash_given = false)
+      password = Digest::MD5.hexdigest(password) unless md5_hash_given
+      data = request('authenticate', {:login => user, :password => password}, true)
       @user = User.new(self, data)
-      raise InvalidAuthentication, 'Wrong username or password!' if @user.id == 0
+      raise InvalidAuthentication, 'Wrong username or password!' if @user.id == 0 || @user.id.nil?
       return @user
     end
 
@@ -139,22 +145,18 @@ module Grooveshark
     def request(method, params={}, secure=false)
       refresh_token if @comm_token
 
-      url = "#{secure ? 'https' : 'http'}://grooveshark.com/more.php?#{method}"
       body = {
         'header' => {
-          'client' => 'mobileshark',
-          'clientRevision' => '20120830',
-          'country' => @country,
-          'privacy' => 0,
-          'session' => @session,
-          'uuid' => @uuid
+          'sessionID' => @session,
+          'wsKey' => @public_key
         },
         'method' => method,
         'parameters' => params
-      }
-      body['header']['token'] = create_token(method) if @comm_token
+      }.to_json
+      signature = create_signature(body)
+      url = "#{secure ? 'https' : 'http'}://api.grooveshark.com/ws3.php?sig=#{signature}"
       begin
-        data = RestClient.post(url, body.to_json, {'Content-Type' => 'application/json'})
+        data = RestClient.post(url, body, {'Content-Type' => 'application/json'})
       rescue Exception => ex
         raise GeneralError, ex.message
       end
@@ -164,9 +166,15 @@ module Grooveshark
 
       if data.key?('fault')
         raise ApiError.new(data['fault'])
+      elsif data.key?('errors')
+        raise ApiError.new(data['errors'].first)
       else
         data['result']
       end
+    end
+
+    def create_signature(body)
+      OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('md5'), @secret_key, body)
     end
 
     # Refresh communications token on ttl
