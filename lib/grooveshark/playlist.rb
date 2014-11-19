@@ -20,8 +20,10 @@ module Grooveshark
 
     # Fetch playlist songs
     def load_songs
-      @songs = @client.request('getPlaylistByID', :playlistID => @id)['songs']
-      @songs.map! { |s| Song.new(s) }
+      @songs = []
+      playlist = @client.request('getPlaylistByID', :playlistID => @id)
+      @songs = playlist['songs'].map! { |s| Song.new(s) } if playlist.key?('songs')
+      @songs
     end
 
     # Rename playlist
@@ -29,7 +31,8 @@ module Grooveshark
       begin
         @client.request('renamePlaylist', :playlistID => @id, :playlistName => name)
         @client.request('setPlaylistAbout', :playlistID => @id, :about => description)
-        @name = name ; @about = description
+        @name = name
+        @about = description
         return true
       rescue
         return false
