@@ -1,4 +1,4 @@
-require File.expand_path("./helper", File.dirname(__FILE__))
+require_relative 'helper'
 
 describe 'Client' do
   context 'initialization' do
@@ -20,7 +20,7 @@ describe 'Client' do
       @gs.comm_token.should match /^[abcdef\d]{40}$/i
     end
   end
-  
+
   context 'authentication' do
     it 'should raise InvalidAuthentication error for invalid credentials' do
       @gs = Grooveshark::Client.new
@@ -30,29 +30,29 @@ describe 'Client' do
     it 'should obtain a new communication token on TTL expiration' do
       @gs = Grooveshark::Client.new(:ttl => 1)
       @tokens = []
-      
+
       3.times do |i|
         @gs.search_songs('Muse')
         @tokens << @gs.comm_token
         sleep 3
       end
-      
+
       @tokens.uniq!
       @tokens.size.should == 3
     end
   end
-  
+
   context 'search' do
     before(:all) do
       @gs = Grooveshark::Client.new
     end
-    
+
     it 'should return empty songs collection' do
       songs = @gs.search_songs("@@@@@%%%%%%%@%@%%@")
       songs.should be_a_kind_of Array
       songs.size.should == 0
     end
-    
+
     it 'should return songs collection' do
       songs = @gs.search_songs('Nirvana')
       songs.should be_a_kind_of Array
@@ -73,7 +73,7 @@ describe 'Client' do
         when /^audio\//
           # This is the expected type
         when /^application\/octet-stream$/
-          # Sometimes the file type can't be detected and this type is returned. At least we 
+          # Sometimes the file type can't be detected and this type is returned. At least we
           # check it's big enough to be an audio file.
           file.size.should >= 500 * 1024
         else
