@@ -1,4 +1,4 @@
-require File.expand_path("./helper", File.dirname(__FILE__))
+require_relative 'helper'
 
 describe Grooveshark::Broadcast do
   let(:client) { Grooveshark::Client.new }
@@ -16,7 +16,7 @@ describe Grooveshark::Broadcast do
       expect(all).to be_true
     end
   end
-  
+
   describe "broadcast" do
     let(:broadcast) { client.top_broadcasts.first }
 
