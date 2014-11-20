@@ -35,9 +35,9 @@ module Grooveshark
       @client.request('setPlaylistAbout', playlistID: @id, about: description)
       @name = name
       @about = description
-      return true
+      true
     rescue
-      return false
+      false
     end
 
     # Delete existing playlist

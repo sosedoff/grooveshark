@@ -117,7 +117,7 @@ module Grooveshark
     def token_data
       response = RestClient.get('http://grooveshark.com')
 
-      preload_regex = /gsPreloadAjax\(\{url: '\/preload.php\?(.*)&hash=' \+ clientPage\}\)/
+      preload_regex = /gsPreloadAjax\(\{url: '\/preload.php\?(.*)&hash=' \+ clientPage\}\)/ # rubocop:disable gnore Metrics/LineLength
       preload_id = response.to_s.scan(preload_regex).flatten.first
       preload_url = "http://grooveshark.com/preload.php?#{preload_id}" \
                     '&getCommunicationToken=1&hash=%2F'
