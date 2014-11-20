@@ -1,3 +1,4 @@
+# Grooveshark module
 module Grooveshark
   class Broadcast
     attr_reader :id, :user_ids
@@ -10,7 +11,7 @@ module Grooveshark
 
       if broadcast_id
         @id = broadcast_id
-        reload_status()
+        reload_status
       elsif data
         @id          = data['broadcast_id'] || broadcast_id
         @name        = data['name']
@@ -28,7 +29,7 @@ module Grooveshark
     def reload_status
       initialize(
         @client, nil,
-        @client.request('broadcastStatusPoll', {:broadcastID => id})
+        @client.request('broadcastStatusPoll', { :broadcastID => @id })
       )
       true
     rescue

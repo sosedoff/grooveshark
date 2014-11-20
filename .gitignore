@@ -15,6 +15,7 @@
 .bundle
 .config
 .directory
+.project
 .elc
 .redcar
 .yardoc

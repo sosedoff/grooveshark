@@ -1,8 +1,15 @@
+# Grooveshark module
 module Grooveshark
-  class InvalidAuthentication < Exception ; end
-  class ReadOnlyAccess < Exception ; end
-  class GeneralError < Exception ; end
+  class InvalidAuthentication < Exception
+  end
 
+  class ReadOnlyAccess < Exception
+  end
+
+  class GeneralError < Exception
+  end
+
+  # Api error
   class ApiError < Exception
     attr_reader :code
 

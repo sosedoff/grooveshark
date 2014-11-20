@@ -7,14 +7,13 @@ describe 'Playlist' do
 
   it 'should initialize with data' do
     playlist = Grooveshark::Playlist
-      .new(double, {
-             'playlist_id' => '1',
-             'name' => 'something',
-             'about' => 'me',
-             'picture' => 'ruby.jpg',
-             'user_id' => '2',
-             'user_name' => 'PierreRambaud'
-           })
+               .new(double,
+                    'playlist_id' => '1',
+                    'name' => 'something',
+                    'about' => 'me',
+                    'picture' => 'ruby.jpg',
+                    'user_id' => '2',
+                    'user_name' => 'PierreRambaud')
     expect(playlist.id).to eq('1')
     expect(playlist.name).to eq('something')
     expect(playlist.about).to eq('me')
@@ -31,25 +30,25 @@ describe 'Playlist' do
 
   it 'should initiliaze with data and user_id' do
     playlist = Grooveshark::Playlist
-      .new(double, {'playlist_id' => '1'}, '2')
+               .new(double, { 'playlist_id' => '1' }, '2')
     expect(playlist.id).to eq('1')
     expect(playlist.user_id).to eq('2')
   end
 
   it "shouldn't load songs if playlist isn't found" do
     client = double
-    allow(client).to receive(:request).with('getPlaylistByID', :playlistID => nil).and_return({})
+    allow(client).to receive(:request)
+      .with('getPlaylistByID', playlistID: nil).and_return({})
     expect(Grooveshark::Playlist.new(client).load_songs).to eq([])
   end
 
   it 'should load songs if playlist is found' do
     client = double
     allow(client).to receive(:request)
-      .with('getPlaylistByID', :playlistID => nil)
-      .and_return({ 'songs' => [
-                                'song_id' => '42',
-                                'name' => 'End of days',
-                                'artist_name' => 'Vinnie Paz' ]})
+      .with('getPlaylistByID', playlistID: nil)
+      .and_return('songs' => ['song_id' => '42',
+                              'name' => 'End of days',
+                              'artist_name' => 'Vinnie Paz'])
     songs = Grooveshark::Playlist.new(client).load_songs
     expect(songs.first).to be_a(Grooveshark::Song)
     expect(songs.first.to_s).to eq('42 - End of days - Vinnie Paz')
