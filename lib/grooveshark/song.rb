@@ -1,25 +1,27 @@
+# Grooveshark module
 module Grooveshark
+  # Song class
   class Song
     attr_reader :data
     attr_reader :id, :artist_id, :album_id
     attr_reader :name, :artist, :album, :track, :year
     attr_reader :duration, :artwork, :playcount
 
-    def initialize(data=nil)
-      unless data.nil?
-        @data       = data
-        @id         = data['song_id']
-        @name       = data['song_name'] || data['name']
-        @artist     = data['artist_name']
-        @artist_id  = data['artist_id']
-        @album      = data['album_name']
-        @album_id   = data['album_id']
-        @track      = data['track_num']
-        @duration   = data['estimate_duration']
-        @artwork    = data['cover_art_filename']
-        @playcount  = data['song_plays']
-        @year       = data['year']
-      end
+    def initialize(data = nil)
+      return if data.nil?
+
+      @data       = data
+      @id         = data['song_id']
+      @name       = data['song_name'] || data['name']
+      @artist     = data['artist_name']
+      @artist_id  = data['artist_id']
+      @album      = data['album_name']
+      @album_id   = data['album_id']
+      @track      = data['track_num']
+      @duration   = data['estimate_duration']
+      @artwork    = data['cover_art_filename']
+      @playcount  = data['song_plays']
+      @year       = data['year']
     end
 
     # Presentable format

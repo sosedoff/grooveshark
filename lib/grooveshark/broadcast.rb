@@ -1,16 +1,18 @@
+# Grooveshark module
 module Grooveshark
+  # Broadcast class
   class Broadcast
     attr_reader :id, :user_ids
     attr_reader :is_active, :is_playing
     attr_reader :name, :usernames
     attr_reader :active_song, :next_song
 
-    def initialize(client, broadcast_id=nil, data=nil)
+    def initialize(client, broadcast_id = nil, data = nil)
       @client = client
 
       if broadcast_id
         @id = broadcast_id
-        reload_status()
+        reload_status
       elsif data
         @id          = data['broadcast_id'] || broadcast_id
         @name        = data['name']
@@ -28,7 +30,7 @@ module Grooveshark
     def reload_status
       initialize(
         @client, nil,
-        @client.request('broadcastStatusPoll', {:broadcastID => id})
+        @client.request('broadcastStatusPoll', broadcastID: @id)
       )
       true
     rescue

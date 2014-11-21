@@ -2,34 +2,35 @@ require_relative 'helper'
 
 describe 'String' do
   it 'should normalize attributes' do
-    vars = ['key_name', 'keyName', 'KeyName', 'KeyNAME']
+    vars = %w(key_name keyName KeyName KeyNAME)
     target = 'key_name'
-    vars.each { |s| s.normalize_attribute.should == target }
+    vars.each { |s| expect(s.normalize_attribute).to eq(target) }
   end
 end
 
 describe 'Hash' do
   it 'should normalize simple keys' do
-    h = {'KeyName' => 'Value'}.normalize
+    h = { 'KeyName' => 'Value' }.normalize
 
-    h.key?('KeyName').should == false
-    h.key?('key_name').should == true
+    expect(h.key?('KeyName')).to be_falsy
+    expect(h.key?('key_name')).to eq(true)
   end
 
   it 'should normalize symbol keys' do
-    h = {:KeyName => 'Value'}.normalize
-    h.key?(:KeyName).should == false
-    h.key?('key_name').should == true
+    h = { KeyName: 'Value' }
+    expect(h[:KeyName]).to eq('Value')
+    expect(h.normalize.key?(:KeyName)).to be_falsy
+    expect(h.normalize.key?('key_name')).to eq(true)
   end
 
   it 'should normalize nested data' do
     h = {
-      'keyA' => {'nestedKey' => 'Value'},
-      'keyB' => [{'arrKey' => 'Value'}]
+      'keyA' => { 'nestedKey' => 'Value' },
+      'keyB' => [{ 'arrKey' => 'Value' }]
     }.normalize
 
-    h['key_a'].key?('nested_key').should == true
-    h['key_b'].class.should == Array
-    h['key_b'].first.key?('arr_key').should == true
+    expect(h['key_a'].key?('nested_key')).to eq(true)
+    expect(h['key_b']).to be_a(Array)
+    expect(h['key_b'].first.key?('arr_key')).to eq(true)
   end
 end

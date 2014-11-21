@@ -1,4 +1,6 @@
+# Grooveshark module
 module Grooveshark
+  # Client class
   class Client
     attr_accessor :session, :comm_token
     attr_reader :user, :comm_token_ttl, :country
@@ -6,60 +8,69 @@ module Grooveshark
     def initialize(params = {})
       @ttl = params[:ttl] || 120 # 2 minutes
       @uuid = UUID.new.generate.upcase
-      get_token_data
+      token_data
     end
 
     # Authenticate user
     def login(user, password)
-      data = request('authenticateUser', {:username => user, :password => password}, true)
+      data = request('authenticateUser',
+                     { username: user, password: password },
+                     true)
       @user = User.new(self, data)
-      raise InvalidAuthentication, 'Wrong username or password!' if @user.id == 0
-      return @user
+      fail InvalidAuthentication, 'Wrong username or password!' if @user.id == 0
+
+      @user
     end
 
     # Find user by ID
     def get_user_by_id(id)
-      resp = request('getUserByID', {:userID => id})['user']
+      resp = request('getUserByID', userID: id)['user']
       resp['username'].empty? ? nil : User.new(self, resp)
     end
 
     # Find user by username
     def get_user_by_username(name)
-      resp = request('getUserByUsername', {:username => name})['user']
+      resp = request('getUserByUsername', username: name)['user']
       resp['username'].empty? ? nil : User.new(self, resp)
     end
 
     # Get recently active users
     def recent_users
-      request('getRecentlyActiveUsers', {})['users'].map { |u| User.new(self, u) }
+      request('getRecentlyActiveUsers', {})['users']
+        .map do |u|
+        User.new(self, u)
+      end
     end
 
     # Get popular songs
     # type => daily, monthly
-    def popular_songs(type='daily')
-      raise ArgumentError, 'Invalid type' unless ['daily', 'monthly'].include?(type)
-      request('popularGetSongs', {:type => type})['songs'].map { |s| Song.new(s) }
+    def popular_songs(type = 'daily')
+      fail ArgumentError, 'Invalid type' unless %w(daily monthly).include?(type)
+      request('popularGetSongs', type: type)['songs'].map { |s| Song.new(s) }
     end
 
     # Get top broadcasts
     # count => specifies how many broadcasts to get
-    def top_broadcasts(count=10)
+    def top_broadcasts(count = 10)
       top_broadcasts = []
-      request('getTopBroadcastsCombined').each do |key,val|
+      request('getTopBroadcastsCombined').each do |key, _val|
         broadcast_id = key.split(':')[1]
         top_broadcasts.push(Broadcast.new(self, broadcast_id))
         count -= 1
-        if count == 0
-          break
-        end
+        break if count == 0
       end
-      return top_broadcasts
+
+      top_broadcasts
     end
 
     # Perform search request for query
     def search(type, query)
-      results = request('getResultsFromSearch', {:type => type, :query => query})['result']
-      results.map { |song| Song.new song }
+      results = []
+      search = request('getResultsFromSearch', type: type, query: query)
+      results = search['result'].map do |song|
+        Song.new song
+      end if search.key?('result')
+      results
     end
 
     # Perform songs search request for query
@@ -69,20 +80,20 @@ module Grooveshark
 
     # Return raw response for songs search request
     def search_songs_pure(query)
-      request('getSearchResultsEx', {:type => 'Songs', :query => query})
+      request('getSearchResultsEx', type: 'Songs', query: query)
     end
 
     # Get stream authentication by song ID
     def get_stream_auth_by_songid(song_id)
-      result = request('getStreamKeyFromSongIDEx', {
-        'type' => 0,
-        'prefetch' => false,
-        'songID' => song_id,
-        'country' => @country,
-        'mobile' => false,
-      })
-      if result == [] then
-        raise GeneralError, "No data for this song. Maybe Grooveshark banned your IP."
+      result = request('getStreamKeyFromSongIDEx',
+                       'type' => 0,
+                       'prefetch' => false,
+                       'songID' => song_id,
+                       'country' => @country,
+                       'mobile' => false)
+      if result == []
+        fail GeneralError, 'No data for this song. ' \
+             'Maybe Grooveshark banned your IP.'
       end
       result
     end
@@ -103,16 +114,18 @@ module Grooveshark
       get_song_url_by_id(song.id)
     end
 
-    def get_token_data
+    def token_data
       response = RestClient.get('http://grooveshark.com')
 
-      preload_regex = /gsPreloadAjax\(\{url: '\/preload.php\?(.*)&hash=' \+ clientPage\}\)/
+      preload_regex = /gsPreloadAjax\(\{url: '\/preload.php\?(.*)&hash=' \+ clientPage\}\)/ # rubocop:disable Metrics/LineLength
       preload_id = response.to_s.scan(preload_regex).flatten.first
-      preload_url = "http://grooveshark.com/preload.php?#{preload_id}&getCommunicationToken=1&hash=%2F"
+      preload_url = "http://grooveshark.com/preload.php?#{preload_id}" \
+                    '&getCommunicationToken=1&hash=%2F'
       preload_response = RestClient.get(preload_url)
 
-      token_data_json = preload_response.to_s.scan(/window.tokenData = (.*);/).flatten.first
-      raise GeneralError, "token data not found" if not token_data_json
+      token_data_json = preload_response.to_s
+                        .scan(/window.tokenData = (.*);/).flatten.first
+      fail GeneralError, 'token data not found' unless token_data_json
       token_data = JSON.parse(token_data_json)
       @comm_token = token_data['getCommunicationToken']
       @comm_token_ttl = Time.now.to_i
@@ -124,7 +137,7 @@ module Grooveshark
     # Sign method
     def create_token(method)
       rnd = get_random_hex_chars(6)
-      salt = "gooeyFlubber"
+      salt = 'gooeyFlubber'
       plain = [method, @comm_token, salt, rnd].join(':')
       hash = Digest::SHA1.hexdigest(plain)
       "#{rnd}#{hash}"
@@ -135,11 +148,7 @@ module Grooveshark
       (0...length).map { chars[rand(chars.length)] }.join
     end
 
-    # Perform API request
-    def request(method, params={}, secure=false)
-      refresh_token if @comm_token
-
-      url = "#{secure ? 'https' : 'http'}://grooveshark.com/more.php?#{method}"
+    def body(method, params)
       body = {
         'header' => {
           'client' => 'mobileshark',
@@ -153,17 +162,27 @@ module Grooveshark
         'parameters' => params
       }
       body['header']['token'] = create_token(method) if @comm_token
+      body
+    end
+
+    # Perform API request
+    def request(method, params = {}, secure = false)
+      refresh_token if @comm_token
+
+      url = "#{secure ? 'https' : 'http'}://grooveshark.com/more.php?#{method}"
       begin
-        data = RestClient.post(url, body.to_json, {'Content-Type' => 'application/json'})
-      rescue Exception => ex
+        data = RestClient.post(url,
+                               body(method, params).to_json,
+                               'Content-Type' => 'application/json')
+      rescue StandardError => ex
         raise GeneralError, ex.message
       end
 
       data = JSON.parse(data)
-      data = data.normalize if data.kind_of?(Hash)
+      data = data.normalize if data.is_a?(Hash)
 
       if data.key?('fault')
-        raise ApiError.new(data['fault'])
+        fail ApiError, data['fault']
       else
         data['result']
       end
@@ -171,7 +190,7 @@ module Grooveshark
 
     # Refresh communications token on ttl
     def refresh_token
-      get_token_data if Time.now.to_i - @comm_token_ttl > @ttl
+      token_data if Time.now.to_i - @comm_token_ttl > @ttl
     end
   end
 end
