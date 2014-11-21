@@ -13,14 +13,14 @@ describe 'Hash' do
     h = { 'KeyName' => 'Value' }.normalize
 
     expect(h.key?('KeyName')).to be_falsy
-    expect(h.key?('key_name')).to be_truthy
+    expect(h.key?('key_name')).to eq(true)
   end
 
   it 'should normalize symbol keys' do
     h = { KeyName: 'Value' }
     expect(h[:KeyName]).to eq('Value')
     expect(h.normalize.key?(:KeyName)).to be_falsy
-    expect(h.normalize.key?('key_name')).to be_truthy
+    expect(h.normalize.key?('key_name')).to eq(true)
   end
 
   it 'should normalize nested data' do
@@ -29,8 +29,8 @@ describe 'Hash' do
       'keyB' => [{ 'arrKey' => 'Value' }]
     }.normalize
 
-    expect(h['key_a'].key?('nested_key')).to be_truthy
+    expect(h['key_a'].key?('nested_key')).to eq(true)
     expect(h['key_b']).to be_a(Array)
-    expect(h['key_b'].first.key?('arr_key')).to be_truthy
+    expect(h['key_b'].first.key?('arr_key')).to eq(true)
   end
 end
