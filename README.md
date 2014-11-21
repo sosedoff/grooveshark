@@ -251,7 +251,7 @@ rake test
 
 - Dan Sosedoff
 - dan.sosedoff@gmail.com
-- http://twitter.com/dan_sosedoff
+- http://twitter.com/sosedoff
 
 ## License
 
