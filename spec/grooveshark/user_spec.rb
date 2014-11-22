@@ -150,14 +150,15 @@ describe 'User' do
       .with('createPlaylist',
             'playlistName' => 'GoT',
             'playlistAbout' => 'Description',
-            'songIDs' => ['10', '11'])
+            'songIDs' => %w(10 11))
       .and_return(true)
 
     user = Grooveshark::User.new(client,
                                  'user_id' => '2')
     expect(user.create_playlist('GoT',
                                 'Description',
-                                [Grooveshark::Song.new({'song_id' => '10'}), 11]))
+                                [Grooveshark::Song.new('song_id' => '10'),
+                                 11]))
       .to eq(true)
   end
 
@@ -186,7 +187,8 @@ describe 'User' do
 
     user = Grooveshark::User.new(client,
                                  'user_id' => '2')
-    expect(user.add_favorite(Grooveshark::Song.new('song_id' => '2'))).to eq(true)
+    expect(user.add_favorite(Grooveshark::Song.new('song_id' => '2')))
+      .to eq(true)
   end
 
   it 'should add favorite song with string parameter' do
@@ -212,7 +214,8 @@ describe 'User' do
 
     user = Grooveshark::User.new(client,
                                  'user_id' => '2')
-    expect(user.remove_favorite(Grooveshark::Song.new('song_id' => '2'))).to eq(true)
+    expect(user.remove_favorite(Grooveshark::Song.new('song_id' => '2')))
+      .to eq(true)
   end
 
   it 'should remove favorite songs with string parameter' do
