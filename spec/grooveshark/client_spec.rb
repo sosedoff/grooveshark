@@ -1,4 +1,6 @@
-require_relative 'helper'
+require_relative '../helper'
+
+require 'grooveshark'
 
 describe 'Client' do
   context 'initialization' do

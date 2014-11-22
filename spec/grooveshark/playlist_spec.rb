@@ -1,5 +1,7 @@
 require_relative '../helper'
 
+require 'grooveshark'
+
 describe 'Playlist' do
   it 'should initialize without data' do
     expect(Grooveshark::Playlist.new(double).id).to be_nil

@@ -6,7 +6,6 @@ require 'rubocop/rake_task'
 RuboCop::RakeTask.new(:rubocop)
 
 RSpec::Core::RakeTask.new(:spec) do |t|
-  t.pattern = 'spec/*_spec.rb'
   t.verbose = false
 end
 
