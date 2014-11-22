@@ -109,4 +109,122 @@ describe 'User' do
     expect(user.library_remove(song))
       .to eq(true)
   end
+
+  it 'should retrieve library timestamp' do
+    client = double
+    allow(client).to receive(:request)
+      .with('userGetLibraryTSModified',
+            userID: '2')
+      .and_return(true)
+
+    user = Grooveshark::User.new(client,
+                                 'user_id' => '2')
+    expect(user.library_ts_modified)
+      .to eq(true)
+  end
+
+  it 'should list user playlists and retrieve playlist from id' do
+    client = double
+    allow(client).to receive(:request)
+      .with('userGetPlaylists',
+            userID: '2')
+      .and_return('playlists' => ['playlist_id' => '1337'])
+
+    user = Grooveshark::User.new(client,
+                                 'user_id' => '2')
+    expect(user.playlists).to be_a(Array)
+    expect(user.playlists.first).to be_a(Grooveshark::Playlist)
+    expect(user.playlists.first.id).to eq('1337')
+    expect(user.playlists.first.user_id).to eq('2')
+
+    expect(user.get_playlist('1337')).to be_a(Grooveshark::Playlist)
+    expect(user.get_playlist('1337').id).to eq('1337')
+    expect(user.get_playlist('1337').user_id).to eq('2')
+
+    expect(user.get_playlist('42')).to be_nil
+  end
+
+  it 'should create playlist' do
+    client = double
+    allow(client).to receive(:request)
+      .with('createPlaylist',
+            'playlistName' => 'GoT',
+            'playlistAbout' => 'Description',
+            'songIDs' => ['10', '11'])
+      .and_return(true)
+
+    user = Grooveshark::User.new(client,
+                                 'user_id' => '2')
+    expect(user.create_playlist('GoT',
+                                'Description',
+                                [Grooveshark::Song.new({'song_id' => '10'}), 11]))
+      .to eq(true)
+  end
+
+  it 'should return favorites songs' do
+    client = double
+    allow(client).to receive(:request)
+      .with('getFavorites',
+            ofWhat: 'Songs',
+            userID: '2')
+      .and_return(['song_id' => '42'])
+
+    user = Grooveshark::User.new(client,
+                                 'user_id' => '2')
+    expect(user.favorites).to be_a(Array)
+    expect(user.favorites.first).to be_a(Grooveshark::Song)
+    expect(user.favorites.first.id).to eq('42')
+  end
+
+  it 'should add favorite song with song object parameter' do
+    client = double
+    allow(client).to receive(:request)
+      .with('favorite',
+            what: 'Song',
+            ID: '2')
+      .and_return(true)
+
+    user = Grooveshark::User.new(client,
+                                 'user_id' => '2')
+    expect(user.add_favorite(Grooveshark::Song.new('song_id' => '2'))).to eq(true)
+  end
+
+  it 'should add favorite song with string parameter' do
+    client = double
+    allow(client).to receive(:request)
+      .with('favorite',
+            what: 'Song',
+            ID: '2')
+      .and_return(true)
+
+    user = Grooveshark::User.new(client,
+                                 'user_id' => '2')
+    expect(user.add_favorite('2')).to eq(true)
+  end
+
+  it 'should remove favorite songs with song object parameter' do
+    client = double
+    allow(client).to receive(:request)
+      .with('unfavorite',
+            what: 'Song',
+            ID: '2')
+      .and_return(true)
+
+    user = Grooveshark::User.new(client,
+                                 'user_id' => '2')
+    expect(user.remove_favorite(Grooveshark::Song.new('song_id' => '2'))).to eq(true)
+  end
+
+  it 'should remove favorite songs with string parameter' do
+    client = double
+    allow(client).to receive(:request)
+      .with('unfavorite',
+            what: 'Song',
+            ID: '2')
+      .and_return(true)
+
+    user = Grooveshark::User.new(client,
+                                 'user_id' => '2')
+    expect(user.remove_favorite('2')).to eq(true)
+  end
 end

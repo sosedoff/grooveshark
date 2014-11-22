@@ -97,7 +97,7 @@ module Grooveshark
                       'playlistName' => name,
                       'playlistAbout' => description,
                       'songIDs' => songs.map do |s|
-                        s.ia_a?(Song) ? s.id : s.to_s
+                        s.is_a?(Song) ? s.id : s.to_s
                       end)
     end
 
