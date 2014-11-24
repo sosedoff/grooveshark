@@ -25,13 +25,13 @@ module Grooveshark
     # Find user by ID
     def get_user_by_id(id)
       resp = request('getUserByID', userID: id)['user']
-      resp['username'].empty? ? nil : User.new(self, resp)
+      resp['username'].nil? ? nil : User.new(self, resp)
     end
 
     # Find user by username
     def get_user_by_username(name)
       resp = request('getUserByUsername', username: name)['user']
-      resp['username'].empty? ? nil : User.new(self, resp)
+      resp['username'].nil? ? nil : User.new(self, resp)
     end
 
     # Get recently active users
