@@ -59,34 +59,22 @@ describe 'Client' do
     it 'should return songs collection' do
       songs = @gs.search_songs('Nirvana')
       expect(songs).to be_a Array
+      expect(songs.first).to be_a(Grooveshark::Song)
       expect(songs.size).to_not eq(0)
     end
-  end
 
-  # context 'download' do
-  #   it 'should download without being banned' do
-  #     gs = Grooveshark::Client.new
-  #     # Usually IP is banned after about 15 minutes
-  #     ten_minutes_later = Time.new + 15 * 60
-  #     while Time.new < ten_minutes_later
-  #       # Try with a short song (this one is about a minute long)
-  #       song = gs.search_songs('Alan Reeves The Chase').first
-  #       url = gs.get_song_url(song)
-  #       file = RestClient::Request
-  #              .execute(method: :post, url: url, raw_response: true).file
-  #       case mime_type = `file -b --mime-type #{file.path}`.strip
-  #       when /^audio\//
-  #         # This is the expected type
-  #       when /^application\/octet-stream$/
-  #         # Sometimes the file type can't be detected and this type
-  #         # is returned. At least we check it's big enough
-  #         # to be an audio file.
-  #         file.size.should >= 500 * 1024
-  #       else
-  #         fail RSpec::Expectations::ExpectationNotMetError,
-  #              "Unknown MIME type (#{mime_type})"
-  #       end
-  #     end
-  #   end
-  # end
+    it 'should return playlist' do
+      playlists = @gs.search('Playlists', 'CruciAGoT')
+      expect(playlists).to be_a(Array)
+      expect(playlists.first).to be_a(Grooveshark::Playlist)
+      expect(playlists.size).to_not eq(0)
+    end
+
+    it 'should return result' do
+      artists = @gs.search('Artists', 'Nirvana')
+      expect(artists).to be_a(Array)
+      expect(artists.first).to be_a(Hash)
+      expect(artists.size).to_not eq(0)
+    end
+  end
 end
