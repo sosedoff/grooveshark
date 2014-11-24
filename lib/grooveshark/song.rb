@@ -31,15 +31,13 @@ module Grooveshark
 
     # Hash export for API usage
     def to_hash
-      {
-        'songID'      => @id,
+      { 'songID'      => @id,
         'songName'    => @name,
         'artistName'  => @artist,
         'artistID'    => @artist_id,
         'albumName'   => @album,
         'albumID'     => @album_id,
-        'track'       => @track
-      }
+        'track'       => @track }
     end
   end
 end

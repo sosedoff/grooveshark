@@ -55,4 +55,44 @@ describe 'Playlist' do
     expect(songs.first).to be_a(Grooveshark::Song)
     expect(songs.first.to_s).to eq('42 - End of days - Vinnie Paz')
   end
+
+  it 'should rename playlist' do
+    client = double
+    allow(client).to receive(:request)
+      .with('renamePlaylist', playlistID: '2', playlistName: 'GoT')
+      .and_return(true)
+
+    allow(client).to receive(:request)
+      .with('setPlaylistAbout', playlistID: '2', about: 'Description')
+      .and_return(true)
+
+    playlist = Grooveshark::Playlist.new(client, 'playlist_id' => '2')
+    expect(playlist.rename('GoT', 'Description')).to eq(true)
+    expect(playlist.name).to eq('GoT')
+    expect(playlist.about).to eq('Description')
+  end
+
+  it 'should return false when rename playlist failed' do
+    client = double
+    allow(client).to receive(:request)
+      .with('renamePlaylist', playlistID: '2', playlistName: 'GoT')
+      .and_raise(ArgumentError)
+
+    playlist = Grooveshark::Playlist.new(client, 'playlist_id' => '2')
+    expect(playlist.rename('GoT', 'Description')).to eq(false)
+    expect(playlist.name).to be_nil
+    expect(playlist.about).to be_nil
+  end
+
+  it 'should delete playlist' do
+    client = double
+    allow(client).to receive(:request)
+      .with('deletePlaylist', playlistID: '2', name: 'GoT')
+      .and_return(true)
+
+    playlist = Grooveshark::Playlist.new(client,
+                                         'playlist_id' => '2',
+                                         'name' => 'GoT')
+    expect(playlist.delete).to eq(true)
+  end
 end
