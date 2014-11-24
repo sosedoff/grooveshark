@@ -1,4 +1,4 @@
-# Grooveshark API
+# Grooveshark API [![Build Status](https://travis-ci.org/sosedoff/grooveshark.svg?branch=master)](https://travis-ci.org/sosedoff/grooveshark)
 
 Unofficial grooveshark API ruby library gives your ability to search and stream songs,
 manage playlists, media library and favorites.
@@ -244,7 +244,7 @@ user.feed
 Run test suite:
 
 ```
-rake test
+bundle exec rake
 ```
 
 ## Contact
