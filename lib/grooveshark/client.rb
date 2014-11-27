@@ -25,13 +25,13 @@ module Grooveshark
     # Find user by ID
     def get_user_by_id(id)
       resp = request('getUserByID', userID: id)['user']
-      resp['username'].empty? ? nil : User.new(self, resp)
+      resp['user_id'].nil? ? nil : User.new(self, resp)
     end
 
     # Find user by username
     def get_user_by_username(name)
       resp = request('getUserByUsername', username: name)['user']
-      resp['username'].empty? ? nil : User.new(self, resp)
+      resp['user_id'].nil? ? nil : User.new(self, resp)
     end
 
     # Get recently active users
@@ -67,8 +67,10 @@ module Grooveshark
     def search(type, query)
       results = []
       search = request('getResultsFromSearch', type: type, query: query)
-      results = search['result'].map do |song|
-        Song.new song
+      results = search['result'].map do |data|
+        next Song.new data if type == 'Songs'
+        next Playlist.new data if type == 'Playlists'
+        data
       end if search.key?('result')
       results
     end

@@ -1,3 +1,8 @@
-$LOAD_PATH.unshift File.expand_path('../..', __FILE__)
+# -*- coding: utf-8 -*-
+$LOAD_PATH << File.expand_path('../lib', __FILE__)
 
-require 'grooveshark'
+require 'simplecov'
+
+SimpleCov.start do
+  add_filter '/spec/'
+end

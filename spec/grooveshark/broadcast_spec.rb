@@ -1,4 +1,6 @@
-require_relative 'helper'
+require_relative '../helper'
+
+require 'grooveshark'
 
 describe Grooveshark::Broadcast do
   let(:client) { Grooveshark::Client.new }

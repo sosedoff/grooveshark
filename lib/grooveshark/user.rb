@@ -2,7 +2,7 @@
 module Grooveshark
   # User class
   class User
-    attr_reader :id, :username, :email, :premium, :data
+    attr_reader :id, :name, :email, :premium, :data
     attr_reader :city, :country, :sex
     attr_reader :playlists, :favorites
 
@@ -11,7 +11,7 @@ module Grooveshark
       if data
         @data     = data
         @id       = data['user_id']
-        @username = data['username']
+        @name     = data['f_name']
         @premium  = data['is_premium']
         @email    = data['email']
         @city     = data['city']
@@ -97,7 +97,7 @@ module Grooveshark
                       'playlistName' => name,
                       'playlistAbout' => description,
                       'songIDs' => songs.map do |s|
-                        s.ia_a?(Song) ? s.id : s.to_s
+                        s.is_a?(Song) ? s.id : s.to_s
                       end)
     end
 

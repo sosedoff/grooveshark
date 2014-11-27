@@ -1,4 +1,6 @@
-require_relative 'helper'
+require_relative '../helper'
+
+require 'grooveshark'
 
 describe 'String' do
   it 'should normalize attributes' do
