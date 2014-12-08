@@ -15,13 +15,15 @@ describe 'Playlist' do
                     'about' => 'me',
                     'picture' => 'ruby.jpg',
                     'user_id' => '2',
-                    'user_name' => 'PierreRambaud')
+                    'f_name' => 'PierreRambaud',
+                    'num_songs' => '50')
     expect(playlist.id).to eq('1')
     expect(playlist.name).to eq('something')
     expect(playlist.about).to eq('me')
     expect(playlist.picture).to eq('ruby.jpg')
     expect(playlist.user_id).to eq('2')
     expect(playlist.username).to eq('PierreRambaud')
+    expect(playlist.num_songs).to eq(50)
   end
 
   it 'should initiliaze without data and user_id' do
