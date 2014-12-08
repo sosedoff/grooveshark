@@ -4,19 +4,20 @@ module Grooveshark
   class Playlist
     attr_reader :id, :user_id
     attr_reader :name, :about, :picture, :username
-    attr_reader :songs
+    attr_reader :songs, :num_songs
 
     def initialize(client, data = nil, user_id = nil)
       @client = client
       @songs = []
 
       return if data.nil?
-      @id       = data['playlist_id']
-      @name     = data['name']
-      @about    = data['about']
-      @picture  = data['picture']
-      @user_id  = data['user_id'] || user_id
-      @username = data['user_name']
+      @id        = data['playlist_id']
+      @name      = data['name']
+      @about     = data['about']
+      @picture   = data['picture']
+      @user_id   = data['user_id'] || user_id
+      @username  = data['f_name']
+      @num_songs = data['num_songs'].to_i
     end
 
     # Fetch playlist songs
