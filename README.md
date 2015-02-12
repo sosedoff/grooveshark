@@ -4,8 +4,6 @@ Unofficial grooveshark API ruby library gives your ability to search and stream 
 manage playlists, media library and favorites.
 API was discovered using http proxy and does not pretend to be always valid due to website API changes.
 
-**Looking for maintainer. Submit a new issue if interested.**
-
 ## Installation
 
 Install gem from rubygems:
@@ -257,7 +255,7 @@ bundle exec rake
 
 MIT License
 
-Copyright (c) 2011-2013 Dan Sosedoff.
+Copyright (c) 2011-2015 Dan Sosedoff <dan.sosedoff@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
