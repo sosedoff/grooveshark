@@ -69,7 +69,7 @@ module Grooveshark
       search = request('getResultsFromSearch', type: type, query: query)
       results = search['result'].map do |data|
         next Song.new data if type == 'Songs'
-        next Playlist.new data if type == 'Playlists'
+        next Playlist.new(self, data) if type == 'Playlists'
         data
       end if search.key?('result')
       results
