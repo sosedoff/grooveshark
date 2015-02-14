@@ -5,7 +5,7 @@ manage playlists, media library and favorites.
 API was discovered using http proxy and does not pretend to be always valid due to website API changes.
 
 [![Build Status](https://travis-ci.org/sosedoff/grooveshark.svg?branch=master)](https://travis-ci.org/sosedoff/grooveshark)
-[![Gem](https://img.shields.io/gem/v/formatador.svg)]()
+[![Gem](https://img.shields.io/gem/v/grooveshark.svg)](https://rubygems.org/gems/grooveshark)
 
 ## Installation
 
