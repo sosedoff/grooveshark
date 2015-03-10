@@ -38,18 +38,6 @@ require 'grooveshark'
 client = Grooveshark::Client.new
 ```
 
-To get session key just call
-
-```
-session = client.session
-```
-
-You can store this key for 7 days after creation and use it like this:
-
-```
-client = Grooveshark::Client.new(SESSION_KEY)
-```
-
 Now we can find some songs:
 
 ```ruby
